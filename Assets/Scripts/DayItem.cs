@@ -1,4 +1,5 @@
 ﻿using System;
+using GreatDevResh.Data;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Serialization;
@@ -61,33 +62,58 @@ public class DayItem : MonoBehaviour
 
     public void UpdateValues(Day dayData)
     {
-        firstValue.text = dayData.first + "/"+ dayData.firstGoal;
-        secondValue.text = dayData.second + "/"+ dayData.secondGoal;
-        thirdValue.text = dayData.third + "/"+ dayData.thirdGoal;
-        fourthValue.text = dayData.fourth + "/"+ dayData.fourthGoal;
-        
-        UpdateColors(dayData);
         UpdateBattery(dayData);
+        
+        if (dayData.activities.Count == 0)
+        {
+            ZeroActivitiesProtocol(dayData);
+            return;
+        }
+        
+        int i1 = 0, i2 = 0, i3 = 0, i4 = 0;
+
+        for (int i = 0; i < dayData.activities.Count; ++i)
+        {
+            if (dayData.activities[i].GetCompleteness() > dayData.activities[i1].GetCompleteness())
+                i1 = i;
+            else if (dayData.activities[i].GetCompleteness() > dayData.activities[i2].GetCompleteness())
+                i2 = i;
+            else if (dayData.activities[i].GetCompleteness() > dayData.activities[i3].GetCompleteness())
+                i3 = i;
+            if (dayData.activities[i].GetCompleteness() < dayData.activities[i4].GetCompleteness())
+                i4 = i;
+        }
+        
+        firstValue.text = dayData.activities[i1].GetStringOfCompleteness();
+        secondValue.text = i1 != i2 ? dayData.activities[i2].GetStringOfCompleteness() : "-";
+        thirdValue.text = i2 != i3 ? dayData.activities[i3].GetStringOfCompleteness() : "-";
+        fourthValue.text = i3 != i4 ? dayData.activities[i4].GetStringOfCompleteness() : "-";
+        
+        ChooseColor(firstImage, dayData.activities[i1]);
+        ChooseColor(secondImage, i1 != i2 ? dayData.activities[i2] : null);
+        ChooseColor(thirdImage, i2 != i3 ? dayData.activities[i3] : null);
+        ChooseColor(fourthImage, i3 != i4 ? dayData.activities[i4] : null);
+        
         UpdateGoalChangeIndicators(dayData);
     }
 
-    private void UpdateColors(Day dayData)
+    private void ZeroActivitiesProtocol(Day dayData)
     {
-        ChooseColor(firstImage, dayData.first, dayData.firstGoal);
-        ChooseColor(secondImage, dayData.second, dayData.secondGoal);
-        ChooseColor(thirdImage, dayData.third, dayData.thirdGoal);
-        ChooseColor(fourthImage, dayData.fourth, dayData.fourthGoal);
+        firstValue.text = secondValue.text = thirdValue.text = fourthValue.text = "-";
+        firstImage.color = secondImage.color = thirdImage.color = fourthImage.color = _color_;
+        goalChangeIndicators[0].sprite =
+            goalChangeIndicators[1].sprite = goalChangeIndicators[2].sprite = goalChangeIndicators[3].sprite = _none;
     }
 
-    private void ChooseColor(Image image, float cur, float goal)
+    private void ChooseColor(Image image, ConsistencyBaseClass value)
     {
-        if (goal == 0)
+        if (value == null || !value.CanBeCompleted())
         {
             image.color = _color_;
             return;
         }
 
-        float ratio = cur / goal;
+        float ratio = value.GetCompleteness();
         
         if (ratio < 0.3f)
             image.color = _color0;
@@ -111,7 +137,7 @@ public class DayItem : MonoBehaviour
 
     private void UpdateBattery(Day dayData)
     {
-        float ratio = dayData.GetRaio();
+        float ratio = dayData.GetSportRaio();
 
         Color col;
         if (ratio < 0)
@@ -142,7 +168,7 @@ public class DayItem : MonoBehaviour
 
         int j = 1;
         battery[0].color = col;
-        for (; j < Mathf.Min(ratio * battery.Length, battery.Length); ++j)
+        for (; j < Mathf.RoundToInt(Mathf.Min(ratio * battery.Length, battery.Length)); ++j)
         {
             battery[j].color = col;
         }

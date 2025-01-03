@@ -1,6 +1,8 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using GreatDevResh.Data;
+using GreatDevResh.MultiUseful;
 using UnityEngine;
 using UnityEngine.Serialization;
 
@@ -295,7 +297,7 @@ public class MyDate
                 ++Year;
             }
 
-            while (_month < 0)
+            while (_month < 1)
             {
                 _month += 12;
                 --Year;
@@ -370,80 +372,116 @@ public class MyDate
 [Serializable]
 public class Day
 {
-    public int first;
-    public int firstGoal;
-    
-    public int second;
-    public int secondGoal;
-    
-    public int third;
-    public int thirdGoal;
-    
-    public int fourth;
-    public int fourthGoal;
+    public List<ConsistencyBaseClass> activities;
+    [FormerlySerializedAs("bonus")] public int bonusForSport;
 
-    public int bonus;
+    public List<ConsistencyBaseClass> discipline;
 
     public Day()
     {
-        first = 0;
-        firstGoal = 0;
-        second = 0;
-        secondGoal = 0;
-        third = 0;
-        thirdGoal = 0;
-        fourth = 0;
-        fourthGoal = 0;
-        bonus = 0;
+        activities = new List<ConsistencyBaseClass>();
+        discipline = new List<ConsistencyBaseClass>();
+        bonusForSport = 0;
     }
 
-    public Day(FourGoals fourGoals)
+    public Day(Day lastDay)
     {
-        firstGoal = fourGoals.first;
-        secondGoal = fourGoals.second;
-        thirdGoal = fourGoals.third;
-        fourthGoal = fourGoals.fourth;
+        activities = new List<ConsistencyBaseClass>();
+        discipline = new List<ConsistencyBaseClass>();
+        bonusForSport = 0;
         
-        first = 0;
-        second = 0;
-        third = 0;
-        fourth = 0;
-        bonus = 0;
+        for (int i = 0; i < lastDay.activities.Count; ++i)
+            activities.Add(ConsistencyBaseClass.MakeSame(lastDay.activities[i]));
+        for (int i = 0; i < lastDay.discipline.Count; ++i)
+            discipline.Add(ConsistencyBaseClass.MakeSame(lastDay.discipline[i]));
     }
 
-    public float GetRaio()
+    public Day(DayVersionZero lastDay)
+    {
+        activities = new List<ConsistencyBaseClass>();
+        discipline = new List<ConsistencyBaseClass>();
+        bonusForSport = lastDay.bonus;
+
+        AmountClass a1 = new AmountClass();
+        a1.goal = lastDay.firstGoal;
+        a1.value = lastDay.first;
+        activities.Add(a1);
+        
+        AmountClass a2 = new AmountClass();
+        a2.goal = lastDay.secondGoal;
+        a2.value = lastDay.secondGoal;
+        activities.Add(a2);
+        
+        AmountClass a3 = new AmountClass();
+        a3.goal = lastDay.thirdGoal;
+        a3.value = lastDay.third;
+        activities.Add(a3);
+        
+        AmountClass a4 = new AmountClass();
+        a4.goal = lastDay.fourthGoal;
+        a4.value = lastDay.fourth;
+        activities.Add(a4);
+    }
+
+    public Day(string str, ref int ind)
+    {
+        ind++;
+        bonusForSport = StringHelper.GetNumber(str, ref ind, ',');
+        int activitiesCount = StringHelper.GetNumber(str, ref ind, ',');
+        int disciplineCount = StringHelper.GetNumber(str, ref ind, ';');
+
+        activities = new List<ConsistencyBaseClass>();
+        discipline = new List<ConsistencyBaseClass>();
+
+        for (int i = 0; i < activitiesCount; ++i)
+        {
+            activities.Add(ConsistencyBaseClass.UnpackHash(str, ref ind));
+            ind++;
+        }
+        for (int i = 0; i < disciplineCount; ++i)
+        {
+            discipline.Add(ConsistencyBaseClass.UnpackHash(str, ref ind));
+            ind++;
+        }
+        ind++;
+    }
+
+    public string GetHash()
+    {
+        string res = "{" + bonusForSport + ",";
+        res += activities.Count + "," + discipline.Count + ";";
+
+        for (int i = 0; i < activities.Count; ++i)
+            res += activities[i].GetHash() + ',';
+        res += ";";
+        for (int i = 0; i < discipline.Count; ++i)
+            res += discipline[i].GetHash() + ",";
+        res += "}";
+
+        return res;
+    }
+
+    public float GetSportRaio()
     {
         float ratio = 0;
         float cnt = 0;
-        
-        if (firstGoal != 0)
+
+        for (int i = 0; i < activities.Count; ++i)
         {
-            ratio += (float)first / firstGoal;
-            ++cnt;
-        }
-        if (secondGoal != 0)
-        {
-            ratio += (float)second / secondGoal;
-            ++cnt;
-        }
-        if (thirdGoal != 0)
-        {
-            ratio += (float)third / thirdGoal;
-            ++cnt;
-        }
-        if (fourthGoal != 0)
-        {
-            ratio += (float)fourth / fourthGoal;
-            ++cnt;
+            if (activities[i].CanBeCompleted())
+            {
+                ++cnt;
+                ratio += activities[i].GetCompleteness();
+            }
         }
 
-        if (bonus > 0)
+        if (bonusForSport > 0)
         {
-            for (int i = 0; i < bonus; ++i)
+            for (int i = 0; i < bonusForSport; ++i)
                 ratio *= 1.3f;
-        } else if (bonus < 0)
+        } else if (bonusForSport < 0)
         {
-            for (int i = 0; i > bonus; --i)
+            for (int i = 0; i > bonusForSport; --i)
                 ratio /= 1.2f;
         }
 
@@ -454,7 +492,7 @@ public class Day
 
     public int GetNumberOfRatio()
     {
-        float ratio = GetRaio();
+        float ratio = GetSportRaio();
         if (ratio < 0)
             return -1;
 

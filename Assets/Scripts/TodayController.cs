@@ -62,11 +62,11 @@ public class TodayController : MonoBehaviour
 
     public void ChangeBonus(int value)
     {
-        today.bonus += value;
-        if (today.bonus < -3)
-            today.bonus = -3;
-        if (today.bonus > 3)
-            today.bonus = 3;
+        today.bonusForSport += value;
+        if (today.bonusForSport < -3)
+            today.bonusForSport = -3;
+        if (today.bonusForSport > 3)
+            today.bonusForSport = 3;
             
         UpdateValues();
     }
@@ -77,7 +77,7 @@ public class TodayController : MonoBehaviour
         secondText.text = today.second.ToString() + "/" + today.secondGoal;
         thirdText.text = today.third.ToString() + "/" + today.thirdGoal;
         fourthText.text = today.fourth.ToString() + "/" + today.fourthGoal;
-        bonusText.text = today.bonus.ToString();
+        bonusText.text = today.bonusForSport.ToString();
         UpdateButtonsImages();
             
         _info.SaveToday();
