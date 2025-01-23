@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using GreatDevResh.Data;
 using TMPro;
 using UnityEngine;
@@ -94,7 +95,7 @@ public class DayItem : MonoBehaviour
         ChooseColor(thirdImage, i2 != i3 ? dayData.activities[i3] : null);
         ChooseColor(fourthImage, i3 != i4 ? dayData.activities[i4] : null);
         
-        UpdateGoalChangeIndicators(dayData);
+        UpdateGoalChangeIndicators(dayData, i1, i2, i3, i4);
     }
 
     private void ZeroActivitiesProtocol(Day dayData)
@@ -114,57 +115,15 @@ public class DayItem : MonoBehaviour
         }
 
         float ratio = value.GetCompleteness();
-        
-        if (ratio < 0.3f)
-            image.color = _color0;
-        else if (ratio < 0.5f)
-            image.color = _color0_3;
-        else if (ratio < 0.7f)
-            image.color = _color0_5;
-        else if (ratio < 1f)
-            image.color = _color0_7;
-        else if (ratio < 1.5f)
-            image.color = _color1;
-        else if (ratio < 3f)
-            image.color = _color1_75;
-        else if (ratio < 4.5f)
-            image.color = _color2_5;
-        else if (ratio < 7f)
-            image.color = _color3_75;
-        else
-            image.color = _color5;
+
+        image.color = GetColor(ratio);
     }
 
     private void UpdateBattery(Day dayData)
     {
         float ratio = dayData.GetSportRaio();
 
-        Color col;
-        if (ratio < 0)
-        {
-            col = _color_;
-        }
-        else
-        {
-            if (ratio < 0.3f)
-                col = _color0;
-            else if (ratio < 0.5f)
-                col = _color0_3;
-            else if (ratio < 0.7f)
-                col = _color0_5;
-            else if (ratio < 1f)
-                col = _color0_7;
-            else if (ratio < 1.5f)
-                col = _color1;
-            else if (ratio < 3f)
-                col = _color1_75;
-            else if (ratio < 4.5f)
-                col = _color2_5;
-            else if (ratio < 7f)
-                col = _color3_75;
-            else
-                col = _color5;
-        }
+        Color col = GetColor(ratio);
 
         int j = 1;
         battery[0].color = col;
@@ -179,25 +138,98 @@ public class DayItem : MonoBehaviour
         }
     }
 
-    private void UpdateGoalChangeIndicators(Day dayData)
+    private void UpdateGoalChangeIndicators(Day dayData, int i1, int i2, int i3, int i4)
     {
         if (previousDay is null)
-        {
             return;
+        
+        goalChangeIndicators[0].sprite =
+            goalChangeIndicators[1].sprite = goalChangeIndicators[2].sprite = goalChangeIndicators[3].sprite = _none;
+        
+        foreach (var progress in from previousActivity in previousDay.activities 
+                 where previousActivity.Name == dayData.activities[i1].Name select dayData.activities[i1].IsHaveProgress(previousActivity))
+        {
+            goalChangeIndicators[0].sprite = progress switch
+            {
+                1 => goalUp,
+                -1 => goalDown,
+                _ => _none
+            };
+            break;
         }
 
-        goalChangeIndicators[0].sprite = dayData.firstGoal > previousDay.firstGoal ? goalUp :
-            (dayData.firstGoal < previousDay.firstGoal ? goalDown : _none);
-        goalChangeIndicators[1].sprite = dayData.secondGoal > previousDay.secondGoal ? goalUp :
-            (dayData.secondGoal < previousDay.secondGoal ? goalDown : _none);
-        goalChangeIndicators[2].sprite = dayData.thirdGoal > previousDay.thirdGoal ? goalUp :
-            (dayData.thirdGoal < previousDay.thirdGoal ? goalDown : _none);
-        goalChangeIndicators[3].sprite = dayData.fourthGoal > previousDay.fourthGoal ? goalUp :
-            (dayData.fourthGoal < previousDay.fourthGoal ? goalDown : _none);
+        if (i1 != i2)
+        {
+            foreach (var progress in from previousActivity in previousDay.activities 
+                     where previousActivity.Name == dayData.activities[i2].Name select dayData.activities[i2].IsHaveProgress(previousActivity))
+            {
+                goalChangeIndicators[1].sprite = progress switch
+                {
+                    1 => goalUp,
+                    -1 => goalDown,
+                    _ => _none
+                };
+                break;
+            }
+        }
+
+        if (i2 != i3)
+        {
+            foreach (var progress in from previousActivity in previousDay.activities 
+                     where previousActivity.Name == dayData.activities[i3].Name select dayData.activities[i3].IsHaveProgress(previousActivity))
+            {
+                goalChangeIndicators[2].sprite = progress switch
+                {
+                    1 => goalUp,
+                    -1 => goalDown,
+                    _ => _none
+                };
+                break;
+            }
+        }
+
+        if (i3 != i4)
+        {
+            foreach (var progress in from previousActivity in previousDay.activities 
+                     where previousActivity.Name == dayData.activities[i4].Name select dayData.activities[i4].IsHaveProgress(previousActivity))
+            {
+                goalChangeIndicators[3].sprite = progress switch
+                {
+                    1 => goalUp,
+                    -1 => goalDown,
+                    _ => _none
+                };
+                break;
+            }
+        }
+
+        // goalChangeIndicators[0].sprite = dayData.firstGoal > previousDay.firstGoal ? goalUp :
+        //     (dayData.firstGoal < previousDay.firstGoal ? goalDown : _none);
+        // goalChangeIndicators[1].sprite = dayData.secondGoal > previousDay.secondGoal ? goalUp :
+        //     (dayData.secondGoal < previousDay.secondGoal ? goalDown : _none);
+        // goalChangeIndicators[2].sprite = dayData.thirdGoal > previousDay.thirdGoal ? goalUp :
+        //     (dayData.thirdGoal < previousDay.thirdGoal ? goalDown : _none);
+        // goalChangeIndicators[3].sprite = dayData.fourthGoal > previousDay.fourthGoal ? goalUp :
+        //     (dayData.fourthGoal < previousDay.fourthGoal ? goalDown : _none);
     }
 
     private void Awake()
     {
         _globalImage = GetComponent<Image>();
     }
+
+    private Color GetColor(float ratio) =>
+        ratio switch
+        {
+            < 0 => _color_,
+            < 0.3f => _color0,
+            < 0.5f => _color0_3,
+            < 0.7f => _color0_5,
+            < 1f => _color0_7,
+            < 1.5f => _color1,
+            < 3f => _color1_75,
+            < 4.5f => _color2_5,
+            < 7f => _color3_75,
+            _ => _color5
+        };
 }

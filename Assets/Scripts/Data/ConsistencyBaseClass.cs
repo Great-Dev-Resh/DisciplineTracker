@@ -25,6 +25,8 @@
         {
             return ":(";
         }
+
+        public virtual int IsHaveProgress(ConsistencyBaseClass previous) => 0;
         
         public virtual string GetHash()
         {

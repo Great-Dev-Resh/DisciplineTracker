@@ -80,13 +80,15 @@ public class Info : MonoBehaviour
             now.Month--;
             LoadLastMonth(now);
             now.Month++;
-            
-            if (generalData.startDate.Int() != now.Int() || generalData.day != DateController.Day)
-                lastDay = Store[now.Int()].days[DateController.Day - 1];
+
+            int dayBefore = DateController.Day;
+            while (lastDay is null && dayBefore > 1 && (generalData.startDate.Int() != now.Int() || generalData.day != dayBefore))
+                lastDay = Store[now.Int()].days[--dayBefore];
+            skip = dayBefore < DateController.Day - 1;
         }
         else if (lastDate is not null)
         {
-            skip = Store[lastDate.Int()].days[lastDate.AmountOfDays()] is null;
+            skip = DateController.Day != 1; //Store[lastDate.Int()].days[lastDate.AmountOfDays()] is null;
             for (int i = Store[lastDate.Int()].days.Count - 1; i > 0; --i)
             {
                 if (Store[lastDate.Int()].days[i] is null) continue;
@@ -105,7 +107,7 @@ public class Info : MonoBehaviour
         {
             fourGoals.UpdateSeries(lastDay, skip);
             SaveGoals();
-            Store[now.Int()].days[DateController.Day] = new Day(fourGoals);
+            Store[now.Int()].days[DateController.Day] = new Day(lastDay);
             SaveToday();
         }
 
@@ -183,10 +185,10 @@ public class Info : MonoBehaviour
     {
         if (!Store.ContainsKey(data.Int()))
             Store[data.Int()] = new MonthData(32);
-        for (int i = 0; i <= 31; ++i)
+        for (int i = 1; i <= 31; ++i)
         {
             if (Store[data.Int()].days[i] is null)
-                Store[data.Int()].days[i] = new Day(fourGoals);
+                Store[data.Int()].days[i] = new Day();
         }
         
         string json = Store[data.Int()].To_string();
@@ -377,6 +379,8 @@ public class Day
 
     public List<ConsistencyBaseClass> discipline;
 
+    public int changesInd = 1;
+
     public Day()
     {
         activities = new List<ConsistencyBaseClass>();
@@ -389,6 +393,9 @@ public class Day
         activities = new List<ConsistencyBaseClass>();
         discipline = new List<ConsistencyBaseClass>();
         bonusForSport = 0;
+
+        if (lastDay is null)
+            return;
         
         for (int i = 0; i < lastDay.activities.Count; ++i)
             activities.Add(ConsistencyBaseClass.MakeSame(lastDay.activities[i]));
@@ -403,23 +410,23 @@ public class Day
         bonusForSport = lastDay.bonus;
 
         AmountClass a1 = new AmountClass();
-        a1.goal = lastDay.firstGoal;
-        a1.value = lastDay.first;
+        a1.SetGoal(lastDay.firstGoal);
+        a1.SetValue(lastDay.first);
         activities.Add(a1);
         
         AmountClass a2 = new AmountClass();
-        a2.goal = lastDay.secondGoal;
-        a2.value = lastDay.secondGoal;
+        a2.SetGoal(lastDay.secondGoal);
+        a2.SetValue(lastDay.second);
         activities.Add(a2);
         
         AmountClass a3 = new AmountClass();
-        a3.goal = lastDay.thirdGoal;
-        a3.value = lastDay.third;
+        a3.SetGoal(lastDay.thirdGoal);
+        a3.SetValue(lastDay.third);
         activities.Add(a3);
         
         AmountClass a4 = new AmountClass();
-        a4.goal = lastDay.fourthGoal;
-        a4.value = lastDay.fourth;
+        a4.SetGoal(lastDay.fourthGoal);
+        a4.SetValue(lastDay.fourth);
         activities.Add(a4);
     }
 
@@ -526,22 +533,15 @@ public class GeneralData
 [Serializable]
 public class FourGoals
 {
-    public int first;
-    public int second;
-    public int third;
-    public int fourth;
-
-    public FourGoals(int v1 = 0, int v2 = 0, int v3 = 0, int v4 = 0)
-    {
-        first = v1;
-        second = v2;
-        third = v3;
-        fourth = v4;
-    }
-    
     public Colors currentSeries = new Colors();
     public Colors maxSeries = new Colors();
     public Colors inTotal = new Colors();
+    
+    // need here dictionary for every activity - sum of all period and last month and last year
+    // maybe achivements here
+    
+    public FourGoals(int v1 = 0, int v2 = 0, int v3 = 0, int v4 = 0)
+    { }
 
     public void UpdateSeries(Day lastDay, bool wasSkip)
     {
@@ -573,12 +573,4 @@ public class FourGoals
 public class Colors
 {
     public int[] c = new int[9];
-    // public int c_03 = 0;
-    // public int c_05 = 0;
-    // public int c_07 = 0;
-    // public int c_1 = 0;
-    // public int c_15 = 0;
-    // public int c_3 = 0;
-    // public int c_45 = 0;
-    // public int c_7 = 0;
 }

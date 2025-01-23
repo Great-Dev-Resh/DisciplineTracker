@@ -1,11 +1,12 @@
 ﻿using GreatDevResh.MultiUseful;
+using UnityEngine;
 
 namespace GreatDevResh.Data
 {
     public class AmountClass : ConsistencyBaseClass
     {
-        public int value;
-        public int goal;
+        public int value { get; private set; }
+        public int goal { get; private set; }
 
         public AmountClass(string str, ref int ind) : base(str, ref ind)
         {
@@ -16,6 +17,21 @@ namespace GreatDevResh.Data
         {
             value = 0;
             goal = 0;
+        }
+        
+        public void SetValue(int _value) => value = Mathf.Max(_value, 0);
+        public void AddValue(int _value) => SetValue(_value + value);
+        public void SetGoal(int _value) => goal = Mathf.Max(_value, 0);
+
+        public int[] GetChanges()
+        {
+            int[] changes = {1, 10, 100};
+            while (changes[2] * 17 <= goal)
+                changes[2] *= 10;
+            changes[1] = changes[2] / 10;
+            changes[0] = changes[1] / 10;
+            
+            return changes;
         }
 
         public override float GetCompleteness()
@@ -31,6 +47,17 @@ namespace GreatDevResh.Data
         public override string GetStringOfCompleteness()
         {
             return value + "/" + goal;
+        }
+
+        public override int IsHaveProgress(ConsistencyBaseClass previous)
+        {
+            if (previous is not AmountClass amountClass)
+                return 0;
+            if (amountClass.goal == goal)
+                return 0;
+            if (amountClass.goal < goal)
+                return 1;
+            return -1;
         }
 
         public override string GetHash()

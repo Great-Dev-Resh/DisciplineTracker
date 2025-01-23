@@ -39,7 +39,7 @@ public class SetTable : MonoBehaviour
             var newday = Instantiate(_dayPrefab, transform);
             if (_info.Store[lastNotAddedMonth.Int()].days[i] is null)
             {
-                _info.Store[lastNotAddedMonth.Int()].days[i] = new Day(_info.fourGoals);
+                _info.Store[lastNotAddedMonth.Int()].days[i] = new Day();
             }
             
             newday.Init(lastNotAddedMonth, i, 

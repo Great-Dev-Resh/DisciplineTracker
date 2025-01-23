@@ -39,6 +39,17 @@ namespace GreatDevResh.Data
             return value / 60 + ":" + value % 60 + " / " + goal / 60 + ":" + goal % 60;
         }
 
+        public override int IsHaveProgress(ConsistencyBaseClass previous)
+        {
+            if (previous is not ScheduleClass schedule)
+                return 0;
+            if (schedule.maxDeviation + schedule.normalDeviation == maxDeviation + normalDeviation)
+                return 0;
+            if (schedule.maxDeviation + schedule.normalDeviation < maxDeviation + normalDeviation)
+                return -1;
+            return 1;
+        }
+
         public override string GetHash()
         {
             return "Sc{" + base.GetHash() + "," + value + "," + goal + "," + normalDeviation + "," + maxDeviation + "}";
