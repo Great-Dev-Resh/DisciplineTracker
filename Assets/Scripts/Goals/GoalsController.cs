@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using GreatDevResh.Data;
+using GreatDevResh.Data.Classes;
 using GreatDevResh.Goals;
 using TMPro;
 using UnityEngine;

@@ -1,14 +1,20 @@
-﻿namespace GreatDevResh.Data
+﻿using GreatDevResh.Data.Interfaces;
+using GreatDevResh.MultiUseful;
+
+namespace GreatDevResh.Data
 {
     public class ConsistencyBaseClass
     {
-        public string Name;
+        public string Title;
+        public int weight;
+        public int groupIndex;
 
         public ConsistencyBaseClass(string str, ref int ind) { }
 
         public ConsistencyBaseClass()
         {
-            Name = "";
+            Title = "";
+            weight = 1;
         }
 
         public virtual float GetCompleteness()
@@ -28,20 +34,20 @@
 
         public virtual int IsHaveProgress(ConsistencyBaseClass previous) => 0;
         
-        public virtual string GetHash()
+        public override string ToString()
         {
-            return "{" + Name + "}";
+            return "{(" + Title.Length + ":" + Title + ")," + weight + "," + groupIndex + "}";
         }
 
         protected virtual void BuildFromStr(string str, ref int ind)
         {
-            ind++;
-            Name = "";
-            while (str[ind] != '}')
-            {
-                Name += str[ind++];
-            }
-            ind++;
+            ind += 2;
+            int len = StringHelper.GetNumber(str, ref ind, ':');
+            Title = StringHelper.GetString(str, ref ind, len);
+            ind += 2;
+
+            weight = StringHelper.GetNumber(str, ref ind, ',');
+            groupIndex = StringHelper.GetNumber(str, ref ind, '}');
         }
 
         public static ConsistencyBaseClass UnpackHash(string str, ref int ind)
@@ -71,7 +77,7 @@
 
         public virtual void CopySettings(ConsistencyBaseClass other)
         {
-            Name = other.Name;
+            Title = other.Title;
         }
     }
 }

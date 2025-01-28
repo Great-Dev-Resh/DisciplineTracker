@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using GreatDevResh.Data.Classes;
+using UnityEngine;
 
 namespace GreatDevResh.Goals
 {
@@ -18,8 +19,8 @@ namespace GreatDevResh.Goals
 
         public void UpdateName(string str) // we need to open menu to change name. When menu closing, we check if name unique. 
         {
-            if (today.activities[index].Name == str) return;
-            today.activities[index].Name = str;
+            if (today.activities[index].Title == str) return;
+            today.activities[index].Title = str;
             goalsController.UpdateValues();
         }
         

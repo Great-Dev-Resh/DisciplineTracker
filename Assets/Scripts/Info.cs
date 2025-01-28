@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using GreatDevResh.Data;
+using GreatDevResh.Data.Classes;
 using GreatDevResh.MultiUseful;
 using UnityEngine;
 using UnityEngine.Serialization;
@@ -29,7 +30,7 @@ public class Info : MonoBehaviour
             return;
 
         string json = currentMonth.To_string();
-        fileDataHandler.Save(now.To_String(), json);
+        FileDataHandler.Save(now.To_String(), json);
     }
 
     public MyDate LoadLastMonth(MyDate _date)
@@ -39,13 +40,13 @@ public class Info : MonoBehaviour
             date.Year == generalData.startDate.Year && date.Month < generalData.startDate.Month)
             return null;
 
-        string json = fileDataHandler.Load(date.To_String());
+        string json = FileDataHandler.Load(date.To_String());
         while ((date.Year > generalData.startDate.Year ||
                 date.Year == generalData.startDate.Year && date.Month > generalData.startDate.Month) &&
                json is null or "")
         {
             --date.Month;
-            json = fileDataHandler.Load(date.To_String());
+            json = FileDataHandler.Load(date.To_String());
         }
 
         if (json is null or "")
@@ -82,7 +83,7 @@ public class Info : MonoBehaviour
             now.Month++;
 
             int dayBefore = DateController.Day;
-            while (lastDay is null && dayBefore > 1 && (generalData.startDate.Int() != now.Int() || generalData.day != dayBefore))
+            while (lastDay is null && dayBefore > 1 && (generalData.startDate.Int() != now.Int() || generalData.startDay != dayBefore))
                 lastDay = Store[now.Int()].days[--dayBefore];
             skip = dayBefore < DateController.Day - 1;
         }
@@ -112,42 +113,36 @@ public class Info : MonoBehaviour
         }
 
         currentDay = DateController.Day;
-
-        for (var cur = new MyDate(ref now); cur >= generalData.startDate; --cur.Month)
-        {
-            if (cur.Int() == now.Int())
-                continue;
-            if (Store.ContainsKey(cur.Int()) && Store[cur.Int()].days[cur.AmountOfDays()] is not null)
-                break;
-            if (Store.ContainsKey(cur.Int()))
-            {
-                CreateMonthData(cur);
-                break;
-            }
-            CreateMonthData(cur);
-        }
+        
+        // for (var cur = new MyDate(ref now); cur >= generalData.startDate; --cur.Month)
+        // {
+        //     if (cur.Int() == now.Int())
+        //         continue;
+        //     if (Store.ContainsKey(cur.Int()) && Store[cur.Int()].days[cur.AmountOfDays()] is not null)
+        //         break;
+        //     if (Store.ContainsKey(cur.Int()))
+        //     {
+        //         CreateMonthData(cur);
+        //         break;
+        //     }
+        //     CreateMonthData(cur);
+        // }
     }
 
     private void GetGeneralData()
     {
-        string generalDataStr = PlayerPrefs.GetString("GeneralData");
-        generalData = null;
-        if (!string.IsNullOrEmpty(generalDataStr))
-        {
-            generalData = JsonUtility.FromJson<GeneralData>(generalDataStr);
-        }
+        GeneralData.Load();
+        generalData = GeneralData.Instance;
 
         if (generalData is null)
         {
             generalData = new GeneralData();
             generalData.startDate = new MyDate(now.Year, now.Month);
             // generalData.startDate.Month -= 3;
-            generalData.day = DateController.Day;
+            generalData.startDay = DateController.Day;
             // generalData.day -= 1;
             
-            generalDataStr = JsonUtility.ToJson(generalData, true);
-            PlayerPrefs.SetString("GeneralData", generalDataStr);
-            PlayerPrefs.Save();
+            GeneralData.Save();
 
             foreach (var obj in OnFirstTimeDisable)
                 obj.SetActive(false);
@@ -192,14 +187,14 @@ public class Info : MonoBehaviour
         }
         
         string json = Store[data.Int()].To_string();
-        fileDataHandler.Save(data.To_String(), json);
+        FileDataHandler.Save(data.To_String(), json);
     }
 
     public Colors GetLastMonthColors()
     {
         Colors lastMonthColors = new Colors();
 
-        for (int i = currentDay - 1; i > 0 && (generalData.startDate.Int() != now.Int() || i >= generalData.day); --i)
+        for (int i = currentDay - 1; i > 0 && (generalData.startDate.Int() != now.Int() || i >= generalData.startDay); --i)
         {
             if (Store[now.Int()].days[i] is null)
                 continue;
@@ -212,7 +207,7 @@ public class Info : MonoBehaviour
         lastMonthDate.Month--;
         for (int i = lastMonthDate.AmountOfDays();
              i >= currentDay && (generalData.startDate < lastMonthDate || 
-                                generalData.startDate.Int() == lastMonthDate.Int() && i >= generalData.day); --i)
+                                generalData.startDate.Int() == lastMonthDate.Int() && i >= generalData.startDay); --i)
         {
             if (Store[lastMonthDate.Int()].days[i] is null)
                 continue;
@@ -226,7 +221,7 @@ public class Info : MonoBehaviour
 
     public Day TryGetPreviousDay(MyDate _date, int day)
     {
-        if (_date.Int() == generalData.startDate.Int() && day <= generalData.day)
+        if (_date.Int() == generalData.startDate.Int() && day <= generalData.startDay)
             return null;
 
         MyDate date = new MyDate(ref _date);
@@ -369,165 +364,6 @@ public class MyDate
             return 29;
         return 28;
     }
-}
-
-[Serializable]
-public class Day
-{
-    public List<ConsistencyBaseClass> activities;
-    [FormerlySerializedAs("bonus")] public int bonusForSport;
-
-    public List<ConsistencyBaseClass> discipline;
-
-    public int changesInd = 1;
-
-    public Day()
-    {
-        activities = new List<ConsistencyBaseClass>();
-        discipline = new List<ConsistencyBaseClass>();
-        bonusForSport = 0;
-    }
-
-    public Day(Day lastDay)
-    {
-        activities = new List<ConsistencyBaseClass>();
-        discipline = new List<ConsistencyBaseClass>();
-        bonusForSport = 0;
-
-        if (lastDay is null)
-            return;
-        
-        for (int i = 0; i < lastDay.activities.Count; ++i)
-            activities.Add(ConsistencyBaseClass.MakeSame(lastDay.activities[i]));
-        for (int i = 0; i < lastDay.discipline.Count; ++i)
-            discipline.Add(ConsistencyBaseClass.MakeSame(lastDay.discipline[i]));
-    }
-
-    public Day(DayVersionZero lastDay)
-    {
-        activities = new List<ConsistencyBaseClass>();
-        discipline = new List<ConsistencyBaseClass>();
-        bonusForSport = lastDay.bonus;
-
-        AmountClass a1 = new AmountClass();
-        a1.SetGoal(lastDay.firstGoal);
-        a1.SetValue(lastDay.first);
-        activities.Add(a1);
-        
-        AmountClass a2 = new AmountClass();
-        a2.SetGoal(lastDay.secondGoal);
-        a2.SetValue(lastDay.second);
-        activities.Add(a2);
-        
-        AmountClass a3 = new AmountClass();
-        a3.SetGoal(lastDay.thirdGoal);
-        a3.SetValue(lastDay.third);
-        activities.Add(a3);
-        
-        AmountClass a4 = new AmountClass();
-        a4.SetGoal(lastDay.fourthGoal);
-        a4.SetValue(lastDay.fourth);
-        activities.Add(a4);
-    }
-
-    public Day(string str, ref int ind)
-    {
-        ind++;
-        bonusForSport = StringHelper.GetNumber(str, ref ind, ',');
-        int activitiesCount = StringHelper.GetNumber(str, ref ind, ',');
-        int disciplineCount = StringHelper.GetNumber(str, ref ind, ';');
-
-        activities = new List<ConsistencyBaseClass>();
-        discipline = new List<ConsistencyBaseClass>();
-
-        for (int i = 0; i < activitiesCount; ++i)
-        {
-            activities.Add(ConsistencyBaseClass.UnpackHash(str, ref ind));
-            ind++;
-        }
-        for (int i = 0; i < disciplineCount; ++i)
-        {
-            discipline.Add(ConsistencyBaseClass.UnpackHash(str, ref ind));
-            ind++;
-        }
-        ind++;
-    }
-
-    public string GetHash()
-    {
-        string res = "{" + bonusForSport + ",";
-        res += activities.Count + "," + discipline.Count + ";";
-
-        for (int i = 0; i < activities.Count; ++i)
-            res += activities[i].GetHash() + ',';
-        res += ";";
-        for (int i = 0; i < discipline.Count; ++i)
-            res += discipline[i].GetHash() + ",";
-        res += "}";
-
-        return res;
-    }
-
-    public float GetSportRaio()
-    {
-        float ratio = 0;
-        float cnt = 0;
-
-        for (int i = 0; i < activities.Count; ++i)
-        {
-            if (activities[i].CanBeCompleted())
-            {
-                ++cnt;
-                ratio += activities[i].GetCompleteness();
-            }
-        }
-
-        if (bonusForSport > 0)
-        {
-            for (int i = 0; i < bonusForSport; ++i)
-                ratio *= 1.3f;
-        } else if (bonusForSport < 0)
-        {
-            for (int i = 0; i > bonusForSport; --i)
-                ratio /= 1.2f;
-        }
-
-        if (cnt == 0)
-            return -1;
-        return ratio / cnt;
-    }
-
-    public int GetNumberOfRatio()
-    {
-        float ratio = GetSportRaio();
-        if (ratio < 0)
-            return -1;
-
-        if (ratio < 0.3f)
-            return 0;
-        if (ratio < 0.5f)
-            return 1;
-        if (ratio < 0.7f)
-            return 2;
-        if (ratio < 1f)
-            return 3;
-        if (ratio < 1.5f)
-            return 4;
-        if (ratio < 3f)
-            return 5;
-        if (ratio < 4.5f)
-            return 6;
-        if (ratio < 7f)
-            return 7;
-        return 8;
-    }
-}
-
-[Serializable]
-public class GeneralData
-{
-    public MyDate startDate;
-    public int day;
 }
 
 [Serializable]

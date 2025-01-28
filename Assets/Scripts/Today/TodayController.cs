@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using GreatDevResh;
 using GreatDevResh.Data;
+using GreatDevResh.Data.Classes;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Serialization;
@@ -45,7 +46,7 @@ public class TodayController : MonoBehaviour
                 amountClass.AddValue(value);
                 break;
             case ScheduleClass scheduleClass:
-                scheduleClass.value += value;
+                //scheduleClass.value += value;
                 break;
             case CheckBoxClass checkBoxClass:
                 checkBoxClass.Completed = value == 1;

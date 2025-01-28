@@ -1,4 +1,5 @@
 ﻿using GreatDevResh.Data;
+using GreatDevResh.Data.Classes;
 using TMPro;
 using UnityEngine;
 
@@ -17,7 +18,7 @@ namespace GreatDevResh.Goals
             if (today.activities[index] is AmountClass _amountClass)
             {
                 amountClass = _amountClass;
-                inputField.text = _amountClass.goal.ToString();
+                inputField.text = amountClass.section.lowerBoundary.ToString();
             } 
             else
                 Debug.LogWarning("Incorrect data class (Should be AmountClass)");
@@ -34,9 +35,9 @@ namespace GreatDevResh.Goals
                 inputField.text = "0";
             }
 
-            if (amountClass.goal != goal)
+            if (amountClass.section.lowerBoundary != goal)
             {
-                amountClass.SetGoal(goal);
+                amountClass.section.lowerBoundary = goal;
                 goalsController.UpdateValues();
             }
         }

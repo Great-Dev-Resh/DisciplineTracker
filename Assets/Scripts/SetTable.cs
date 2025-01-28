@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using GreatDevResh.Data.Classes;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -34,7 +35,7 @@ public class SetTable : MonoBehaviour
             Instantiate(_emptyPrefab, transform);
         }
 
-        for (int i = day; i > 0 && (lastNotAddedMonth > _info.generalData.startDate || i >= _info.generalData.day); --i)
+        for (int i = day; i > 0 && (lastNotAddedMonth > _info.generalData.startDate || i >= _info.generalData.startDay); --i)
         {
             var newday = Instantiate(_dayPrefab, transform);
             if (_info.Store[lastNotAddedMonth.Int()].days[i] is null)
@@ -100,7 +101,7 @@ public class SetTable : MonoBehaviour
         for (int i = lastNotAddedMonth.AmountOfDays(); i >= 1; --i)
         {
             if (lastNotAddedMonth.Int() == _info.generalData.startDate.Int() &&
-                i < _info.generalData.day)
+                i < _info.generalData.startDay)
                 break;
             
             var newday = Instantiate(_dayPrefab, transform);

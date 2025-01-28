@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using GreatDevResh.Data.Classes;
 using GreatDevResh.MultiUseful;
 using UnityEngine;
 
@@ -21,7 +22,10 @@ public class MonthData
             days.Count + "\n";
         for (int i = 0; i < days.Count; ++i)
         {
-            result += days[i].GetHash() + "\n";
+            if (days[i] is null)
+                result += "N\n";
+            else
+                result += days[i].GetHash() + "\n";
         }
         return result;
     }
@@ -38,7 +42,7 @@ public class MonthData
         int ind = 1;
         while (str[ind] != '\n')
         {
-            version = version *= 10 + str[ind++] - '0';
+            version = version * 10 + str[ind++] - '0';
         }
         ind++;
 
@@ -55,7 +59,13 @@ public class MonthData
         days = new List<Day>();
         for (int i = 0; i < countDays; ++i)
         {
-            days.Add(new Day(str, ref ind));
+            if (str[ind] == 'N')
+            {
+                days.Add(null);
+                ind++;
+            }
+            else
+                days.Add(new Day(str, ref ind));
             ind++;
         }
     }

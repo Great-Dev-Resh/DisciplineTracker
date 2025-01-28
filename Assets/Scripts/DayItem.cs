@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using GreatDevResh.Data;
+using GreatDevResh.Data.Classes;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Serialization;
@@ -147,7 +148,7 @@ public class DayItem : MonoBehaviour
             goalChangeIndicators[1].sprite = goalChangeIndicators[2].sprite = goalChangeIndicators[3].sprite = _none;
         
         foreach (var progress in from previousActivity in previousDay.activities 
-                 where previousActivity.Name == dayData.activities[i1].Name select dayData.activities[i1].IsHaveProgress(previousActivity))
+                 where previousActivity.Title == dayData.activities[i1].Title select dayData.activities[i1].IsHaveProgress(previousActivity))
         {
             goalChangeIndicators[0].sprite = progress switch
             {
@@ -161,7 +162,7 @@ public class DayItem : MonoBehaviour
         if (i1 != i2)
         {
             foreach (var progress in from previousActivity in previousDay.activities 
-                     where previousActivity.Name == dayData.activities[i2].Name select dayData.activities[i2].IsHaveProgress(previousActivity))
+                     where previousActivity.Title == dayData.activities[i2].Title select dayData.activities[i2].IsHaveProgress(previousActivity))
             {
                 goalChangeIndicators[1].sprite = progress switch
                 {
@@ -176,7 +177,7 @@ public class DayItem : MonoBehaviour
         if (i2 != i3)
         {
             foreach (var progress in from previousActivity in previousDay.activities 
-                     where previousActivity.Name == dayData.activities[i3].Name select dayData.activities[i3].IsHaveProgress(previousActivity))
+                     where previousActivity.Title == dayData.activities[i3].Title select dayData.activities[i3].IsHaveProgress(previousActivity))
             {
                 goalChangeIndicators[2].sprite = progress switch
                 {
@@ -191,7 +192,7 @@ public class DayItem : MonoBehaviour
         if (i3 != i4)
         {
             foreach (var progress in from previousActivity in previousDay.activities 
-                     where previousActivity.Name == dayData.activities[i4].Name select dayData.activities[i4].IsHaveProgress(previousActivity))
+                     where previousActivity.Title == dayData.activities[i4].Title select dayData.activities[i4].IsHaveProgress(previousActivity))
             {
                 goalChangeIndicators[3].sprite = progress switch
                 {

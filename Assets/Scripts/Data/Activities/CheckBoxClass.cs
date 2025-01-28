@@ -3,6 +3,7 @@
     public class CheckBoxClass: ConsistencyBaseClass
     {
         public bool Completed;
+        public bool DefaultValue;
         
         public CheckBoxClass(string str, ref int ind) : base(str, ref ind)
         {
@@ -21,12 +22,12 @@
 
         public override string GetStringOfCompleteness()
         {
-            return Completed ? "Done!" : "Failed";
+            return Completed ? "Done" : "Failed";
         }
 
-        public override string GetHash()
+        public override string ToString()
         {
-            return "Ch{" + base.GetHash() + "}";
+            return "Ch{" + base.ToString() + "," + (DefaultValue ? 1 : 0) + "}";
         }
 
         protected override void BuildFromStr(string str, ref int ind)
@@ -34,11 +35,16 @@
             ind += 3;
             base.BuildFromStr(str, ref ind);
             ind++;
+            DefaultValue = str[ind] == '1';
+            ind += 2;
         }
 
         public override void CopySettings(ConsistencyBaseClass other)
         {
             base.CopySettings(other);
+            if (other is not CheckBoxClass checkBoxClass)
+                return;
+            DefaultValue = checkBoxClass.DefaultValue;
         }
     }
 }

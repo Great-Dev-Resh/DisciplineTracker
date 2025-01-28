@@ -52,7 +52,7 @@ namespace GreatDevResh
             m10.transform.Find("Text").GetComponent<TMP_Text>().text = "-" + changes[1];
             m100.transform.Find("Text").GetComponent<TMP_Text>().text = "-" + changes[2];
 
-            name.text = amountClass.Name;
+            name.text = amountClass.Title;
         }
 
         public void Plus(int ind)

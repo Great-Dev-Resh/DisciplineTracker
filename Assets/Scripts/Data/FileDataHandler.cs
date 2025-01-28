@@ -4,16 +4,16 @@ using UnityEngine;
 
 public class FileDataHandler
 {
-    private string dataDirPath;
+    private static string dataDirPath;
 
-    public FileDataHandler(string dataDirPath)
+    public FileDataHandler(string _dataDirPath)
     {
-        this.dataDirPath = dataDirPath;
+        dataDirPath = _dataDirPath;
     }
 
-    public string Load(string fileName)
+    public static string Load(string fileName)
     {
-        string fullPath = Path.Combine(this.dataDirPath, fileName);
+        string fullPath = Path.Combine(dataDirPath, fileName);
 
         if (File.Exists(fullPath))
         {
@@ -39,9 +39,9 @@ public class FileDataHandler
         return null;
     }
 
-    public void Save(string fileName, string data)
+    public static void Save(string fileName, string data)
     {
-        string fullPath = Path.Combine(this.dataDirPath, fileName);
+        string fullPath = Path.Combine(dataDirPath, fileName);
 
         try
         {
