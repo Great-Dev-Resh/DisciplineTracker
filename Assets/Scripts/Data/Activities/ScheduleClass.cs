@@ -44,6 +44,7 @@ namespace GreatDevResh.Data
 
         public override string ToString()
         {
+            value ??= defaultValue;
             return "Sc{" + base.ToString() + "," + value.GetHash() + "," + defaultValue.GetHash() + "," + section.GetHash() + "}";
         }
 

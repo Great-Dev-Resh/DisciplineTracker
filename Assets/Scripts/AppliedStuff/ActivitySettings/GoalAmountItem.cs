@@ -11,7 +11,6 @@ namespace GreatDevResh.AppliedStuff
     {
         private AmountClass amountClass;
 
-        [SerializeField] private TMP_Text Title;
         [SerializeField] private TMP_InputField IF_lowerBoundary;
         [SerializeField] private TMP_InputField IF_upperBoundary;
         [SerializeField] private TMP_InputField IF_lowerRange;
@@ -27,6 +26,7 @@ namespace GreatDevResh.AppliedStuff
         public void Init(AmountClass _amountClass)
         {
             amountClass = _amountClass;
+            OnInit?.Invoke();
             
             UpdatePicture();
         }
@@ -37,18 +37,25 @@ namespace GreatDevResh.AppliedStuff
         {
             isUpdatingPicture = true;
             Title.text = amountClass.Title;
+            UpdateGroupVisual();
 
             Toggle_lowerBoundary.isOn = amountClass.section.lowerBoundary != -1;
             Toggle_upperBoundary.isOn = amountClass.section.upperBoundary != -1;
             
             IF_lowerBoundary.text = amountClass.section.lowerBoundary.ToString();
             IF_upperBoundary.text = amountClass.section.upperBoundary.ToString();
-            IF_lowerRange.text = amountClass.section.lowerRange.ToString();
-            IF_upperRange.text = amountClass.section.upperRange.ToString();
+            IF_lowerRange.text = amountClass.section.GetLowerBorderMinusRange().ToString();
+            IF_upperRange.text = amountClass.section.GetUpperBorderPlusRange().ToString();
 
             IF_defaultValue.text = amountClass.defaultValue.ToString();
 
             isUpdatingPicture = false;
+        }
+
+        protected override void UpdateGroupVisual()
+        {
+            if (amountClass is not null)
+                GroupDropDown.SetSelectedItem(amountClass.groupIndex);
         }
 
         public void OnValueChanged()
@@ -75,24 +82,31 @@ namespace GreatDevResh.AppliedStuff
             
             int defaultValue = int.Parse(IF_defaultValue.text);
             int lowerBoundary = Toggle_lowerBoundary.isOn ? int.Parse(IF_lowerBoundary.text) : -1;
-            int upperBoundary = Toggle_upperBoundary.isOn ? int.Parse(IF_upperBoundary.text) : -1;
-            int lowerRange = Toggle_lowerBoundary.isOn ? int.Parse(IF_lowerRange.text) : 0;
-            int upperRange = Toggle_upperBoundary.isOn ? int.Parse(IF_upperRange.text) : 0;
+            int upperBoundary = Toggle_upperBoundary.isOn ? Mathf.Max(lowerBoundary, int.Parse(IF_upperBoundary.text)) : -1;
+            int lowerRange = Toggle_lowerBoundary.isOn ? Mathf.Max(0, lowerBoundary - int.Parse(IF_lowerRange.text)) : 0;
+            int upperRange = Toggle_upperBoundary.isOn ? Mathf.Max(0, int.Parse(IF_upperRange.text) - upperBoundary) : 0;
 
             if (amountClass.defaultValue == defaultValue && amountClass.section.lowerBoundary == lowerBoundary &&
                 amountClass.section.upperBoundary == upperBoundary && amountClass.section.lowerRange == lowerRange &&
                 amountClass.section.upperRange == upperRange)
+            {
+                UpdatePicture();
                 return;
+            }
 
             amountClass.defaultValue = defaultValue;
             amountClass.section.lowerBoundary = lowerBoundary;
             amountClass.section.upperBoundary = upperBoundary;
             amountClass.section.lowerRange = lowerRange;
             amountClass.section.upperRange = upperRange;
-
-            Debug.Log("End editing: " + amountClass.section.upperBoundary);
             
             UpdatePicture();
+            GeneralData.Save();
+        }
+
+        public override void ChangeGroup(int newInd)
+        {
+            amountClass.groupIndex = newInd;
             GeneralData.Save();
         }
 

@@ -15,13 +15,22 @@ namespace GreatDevResh.AppliedStuff
         public void Init(CheckBoxClass _checkBoxClass)
         {
             checkBoxClass = _checkBoxClass;
+            OnInit?.Invoke();
 
             UpdatePicture();
         }
 
         protected override void UpdatePicture()
         {
+            Title.text = checkBoxClass.Title;
             Toggle_defaultValue.isOn = checkBoxClass.DefaultValue;
+            UpdateGroupVisual();
+        }
+        
+        protected override void UpdateGroupVisual()
+        {
+            if (checkBoxClass is not null)
+                GroupDropDown.SetSelectedItem(checkBoxClass.groupIndex);
         }
 
 
@@ -31,6 +40,12 @@ namespace GreatDevResh.AppliedStuff
                 return;
 
             checkBoxClass.DefaultValue = Toggle_defaultValue.isOn;
+            GeneralData.Save();
+        }
+        
+        public override void ChangeGroup(int newInd)
+        {
+            checkBoxClass.groupIndex = newInd;
             GeneralData.Save();
         }
     }

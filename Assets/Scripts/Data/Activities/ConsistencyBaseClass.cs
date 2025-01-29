@@ -1,4 +1,5 @@
-﻿using GreatDevResh.Data.Interfaces;
+﻿using GreatDevResh.Data.Classes;
+using GreatDevResh.Data.Interfaces;
 using GreatDevResh.MultiUseful;
 
 namespace GreatDevResh.Data
@@ -7,7 +8,19 @@ namespace GreatDevResh.Data
     {
         public string Title;
         public int weight;
-        public int groupIndex;
+
+        public int groupIndex
+        {
+            get
+            {
+                if (_groupIndex != 0 && !GeneralData.Instance.GroupNames.ContainsKey(_groupIndex))
+                    _groupIndex = 0;
+                return _groupIndex;
+            }
+            set => _groupIndex = value;
+        }
+
+        private int _groupIndex;
 
         public ConsistencyBaseClass(string str, ref int ind) { }
 

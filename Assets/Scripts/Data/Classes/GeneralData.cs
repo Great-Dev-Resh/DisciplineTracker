@@ -15,8 +15,12 @@ namespace GreatDevResh.Data.Classes
         [FormerlySerializedAs("day")] public int startDay;
 
         public List<RegimeClass> Regimes;
-        public List<string> GroupNames;
+        public Dictionary<int, string> GroupNames;
         public int DefaultRegime;
+        public int MaxGroupIndex;
+
+        public int GroupUpdateVersion = 0;
+        public int RegimeUpdateVersion = 0;
 
         // statistics
         // settings
@@ -24,11 +28,11 @@ namespace GreatDevResh.Data.Classes
         public GeneralData()
         {
             Regimes = new List<RegimeClass>();
-            GroupNames = new List<string>();
+            GroupNames = new Dictionary<int, string>();
             DefaultRegime = 0;
             
             Regimes.Add(new RegimeClass("Normal"));
-            GroupNames.Add("First group");
+            MaxGroupIndex = 0;
 
             Instance = this;
         }
@@ -42,10 +46,20 @@ namespace GreatDevResh.Data.Classes
             startDate = new MyDate(year, month);
 
             Regimes = StringHelper.GetList<RegimeClass>(str, ref ind);
-            ++ind;
-            GroupNames = StringHelper.GetList(str, ref ind);
-            ++ind;
-            DefaultRegime = StringHelper.GetNumber(str, ref ind, '}');
+            ind += 2;
+            GroupNames = new Dictionary<int, string>();
+            while (str[ind] == '(')
+            {
+                ++ind;
+                int key = StringHelper.GetNumber(str, ref ind, ',');
+                int len = StringHelper.GetNumber(str, ref ind, ',');
+                string group = StringHelper.GetString(str, ref ind, len);
+                GroupNames[key] = group;
+                ind += 2;
+            }
+            ind += 2;
+            DefaultRegime = StringHelper.GetNumber(str, ref ind, ',');
+            MaxGroupIndex = StringHelper.GetNumber(str, ref ind, '}');
 
             Instance = this;
         }
@@ -54,8 +68,14 @@ namespace GreatDevResh.Data.Classes
         {
             string res = "{" + startDay + "," + startDate.Month + "," + startDate.Year + "\n";
             res += StringHelper.PackList(ref Regimes);
-            res += "\n" + StringHelper.PackList(ref GroupNames);
-            res += "\n" + DefaultRegime + "}";
+            res += "\n{";
+            foreach (var pair in GroupNames)
+            {
+                res += "(" + pair.Key + "," + pair.Value.Length + "," + pair.Value + "),";
+            }
+
+            res += "}\n";
+            res += DefaultRegime + "," + MaxGroupIndex + "}";
             
             return res;
         }

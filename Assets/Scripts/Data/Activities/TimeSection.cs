@@ -1,5 +1,7 @@
-﻿using GreatDevResh.MultiUseful;
+﻿using System;
+using GreatDevResh.MultiUseful;
 using UnityEngine;
+using UnityEngine.Events;
 
 namespace GreatDevResh.Data
 {
@@ -37,7 +39,7 @@ namespace GreatDevResh.Data
         
         public string GetHash()
         {
-            return "{" + lowerBoundary.minutes + "," + upperBoundary.minutes + "," + lowerRange.minutes + "," + upperRange + "}";
+            return "{" + lowerBoundary.minutes + "," + upperBoundary.minutes + "," + lowerRange.minutes + "," + upperRange.minutes + "}";
         }
 
         public TimeSection(string str, ref int ind)

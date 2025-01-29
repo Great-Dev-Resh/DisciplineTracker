@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using GreatDevResh.Data;
 using GreatDevResh.Data.Classes;
 using GreatDevResh.Data.Regimes;
@@ -9,13 +10,16 @@ namespace GreatDevResh.AppliedStuff
     public class GoalShower : MonoBehaviour
     {
         [SerializeField] private GoalAmountItem amountPrefab;
+        [SerializeField] private GoalScheduleItem schedulePrefab;
         [SerializeField] private GoalCheckBoxItem checkBoxPrefab;
         [SerializeField] private Transform content;
+        [SerializeField] private GameObject DeleteWarningPage;
 
-        private int currentRegimeIndex;
+        private int currentRegimeIndex = 0;
         
 
         private List<GoalAmountItem> amountObjects;
+        private List<GoalScheduleItem> scheduleObjects;
         private List<GoalCheckBoxItem> checkBoxObjects;
         private List<RectTransform> activeObjects;
 
@@ -24,9 +28,10 @@ namespace GreatDevResh.AppliedStuff
         private void Start()
         {
             amountObjects = new List<GoalAmountItem>();
+            scheduleObjects = new List<GoalScheduleItem>();
+            checkBoxObjects = new List<GoalCheckBoxItem>();
             activeObjects = new List<RectTransform>();
 
-            currentRegimeIndex = GeneralData.Instance.DefaultRegime;
             UpdateList();
         }
 
@@ -35,11 +40,12 @@ namespace GreatDevResh.AppliedStuff
             regime = GeneralData.Instance.Regimes[currentRegimeIndex];
 
             int amountInd = 0;
+            int scheduleInd = 0;
             int checkBoxInd = 0;
             activeObjects.Clear();
-            while (amountInd + checkBoxInd < regime.activities.Count)
+            while (amountInd + scheduleInd + checkBoxInd < regime.activities.Count)
             {
-                if (regime.activities[amountInd + checkBoxInd] is AmountClass amountClass)
+                if (regime.activities[amountInd + scheduleInd + checkBoxInd] is AmountClass amountClass)
                 {
                     if (amountInd >= amountObjects.Count)
                     {
@@ -50,11 +56,12 @@ namespace GreatDevResh.AppliedStuff
                         amountObjects[amountInd].gameObject.SetActive(true);
                     }
                     amountObjects[amountInd].Init(amountClass);
-                    amountObjects[amountInd].SetElementIndex(amountInd + checkBoxInd);
-                    amountObjects[amountInd].transform.SetSiblingIndex(amountInd + checkBoxInd);
+                    amountObjects[amountInd].SetElementIndex(amountInd + scheduleInd + checkBoxInd);
+                    amountObjects[amountInd].transform.SetSiblingIndex(amountInd + scheduleInd + checkBoxInd);
                     
                     activeObjects.Add(amountObjects[amountInd].GetComponent<RectTransform>());
-                } else if (regime.activities[amountInd + checkBoxInd] is CheckBoxClass checkBoxClass)
+                    ++amountInd;
+                } else if (regime.activities[amountInd + scheduleInd + checkBoxInd] is CheckBoxClass checkBoxClass)
                 {
                     if (checkBoxInd >= checkBoxObjects.Count)
                     {
@@ -65,13 +72,32 @@ namespace GreatDevResh.AppliedStuff
                         checkBoxObjects[checkBoxInd].gameObject.SetActive(true);
                     }
                     checkBoxObjects[checkBoxInd].Init(checkBoxClass);
-                    checkBoxObjects[checkBoxInd].SetElementIndex(amountInd + checkBoxInd);
-                    checkBoxObjects[checkBoxInd].transform.SetSiblingIndex(amountInd + checkBoxInd);
+                    checkBoxObjects[checkBoxInd].SetElementIndex(amountInd + scheduleInd + checkBoxInd);
+                    checkBoxObjects[checkBoxInd].transform.SetSiblingIndex(amountInd + scheduleInd + checkBoxInd);
                     
                     activeObjects.Add(checkBoxObjects[checkBoxInd].GetComponent<RectTransform>());
+                    checkBoxInd++;
+                } else if (regime.activities[amountInd + scheduleInd + checkBoxInd] is ScheduleClass scheduleClass)
+                {
+                    if (scheduleInd >= scheduleObjects.Count)
+                    {
+                        var obj = Instantiate(schedulePrefab, content);
+                        obj.SetGoalShower(this);
+                        scheduleObjects.Add(obj);
+                    } else {
+                        scheduleObjects[scheduleInd].gameObject.SetActive(true);
+                    }
+                    
+                    scheduleObjects[scheduleInd].Init(scheduleClass);
+                    scheduleObjects[scheduleInd].SetElementIndex(amountInd + scheduleInd + checkBoxInd);
+                    scheduleObjects[scheduleInd].transform.SetSiblingIndex(amountInd + scheduleInd + checkBoxInd);
+                    
+                    activeObjects.Add(scheduleObjects[scheduleInd].GetComponent<RectTransform>());
+                    scheduleInd++;
+                } else
+                {
+                    amountInd++;
                 }
-
-                ++amountInd;
             }
 
             while (amountInd < amountObjects.Count)
@@ -85,9 +111,13 @@ namespace GreatDevResh.AppliedStuff
                 checkBoxObjects[checkBoxInd].gameObject.SetActive(false);
                 ++checkBoxInd;
             }
+            
+            while (scheduleInd < scheduleObjects.Count)
+            {
+                scheduleObjects[scheduleInd].gameObject.SetActive(false);
+                ++scheduleInd;
+            }
         }
-
-        public float GetChildMiddle(int ind) => activeObjects[ind].rect.center.y;
 
         public void SwapChildren(int minInd)
         {
@@ -100,6 +130,29 @@ namespace GreatDevResh.AppliedStuff
 
             (regime.activities[minInd], regime.activities[minInd + 1]) = (regime.activities[minInd + 1], regime.activities[minInd]);
             GeneralData.Save();
+        }
+
+        private int deletingElementIndex;
+        public void DeleteElement(int ind)
+        {
+            DeleteWarningPage.SetActive(true);
+            deletingElementIndex = ind;
+        }
+
+        public void ConfirmDelete()
+        {
+            if (deletingElementIndex < 0 || deletingElementIndex >= activeObjects.Count)
+                return;
+            
+            regime.activities.RemoveAt(deletingElementIndex);
+            GeneralData.Save();
+            UpdateList();
+        }
+
+        public void SetRegime(int value)
+        {
+            currentRegimeIndex = value;
+            UpdateList();
         }
     }
 }
