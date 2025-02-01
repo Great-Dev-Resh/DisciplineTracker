@@ -26,24 +26,27 @@ namespace GreatDevResh.AppliedStuff
         
         public void UpdateList()
         {
-            if (localUpdateVersion == GeneralData.Instance.RegimeUpdateVersion)
+            if (localUpdateVersion == GeneralData.RegimeUpdateVersion)
                 return;
-            localUpdateVersion = GeneralData.Instance.RegimeUpdateVersion;
+            localUpdateVersion = GeneralData.RegimeUpdateVersion;
             
             Dropdown.options = new List<TMP_Dropdown.OptionData>();
-            foreach (var regime in GeneralData.Instance.Regimes)
+            foreach (var regime in GeneralData.Regimes)
             {
                 Dropdown.options.Add(new TMP_Dropdown.OptionData(regime.Name));
             }
             
             Dropdown.RefreshShownValue();
         }
-        
+
+        private bool ItemAlreadySelected = false;
         public void SetSelectedItem(int ind)
         {
+            ItemAlreadySelected = true;
             if (Index == ind)
                 return;
             
+            UpdateList();
             Dropdown.SetValueWithoutNotify(ind);
             Index = ind;
         }
@@ -53,9 +56,13 @@ namespace GreatDevResh.AppliedStuff
         private void Start()
         {
             startHappened = true;
-            
-            SetSelectedItem(GeneralData.Instance.DefaultRegime);
-            OnValueChangedAction?.Invoke(GeneralData.Instance.DefaultRegime);
+
+            if (!ItemAlreadySelected)
+            {
+                SetSelectedItem(GeneralData.DefaultRegime);
+                OnValueChangedAction?.Invoke(GeneralData.DefaultRegime);
+            }
+
             UpdateList();
         }
 

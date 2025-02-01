@@ -1,6 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
+using GreatDevResh.Data.Regimes;
 using GreatDevResh.MultiUseful;
+using UnityEngine;
 using UnityEngine.Serialization;
 
 namespace GreatDevResh.Data.Classes
@@ -12,7 +15,7 @@ namespace GreatDevResh.Data.Classes
         public List<ConsistencyBaseClass> activities;
         [FormerlySerializedAs("bonus")] public int bonusForSport;
 
-        public int changesInd = 1;
+        public int changesInd = 0;
 
         public Day()
         {
@@ -32,6 +35,17 @@ namespace GreatDevResh.Data.Classes
             
             for (int i = 0; i < lastDay.activities.Count; ++i)
                 activities.Add(ConsistencyBaseClass.MakeSame(lastDay.activities[i]));
+        }
+        
+        public Day(RegimeClass regime)
+        {
+            NameOfRegime = regime.Name;
+            activities = new List<ConsistencyBaseClass>();
+            foreach (var activity in regime.activities)
+            {
+                activities.Add(ConsistencyBaseClass.MakeSame(activity));
+            }
+            bonusForSport = 0;
         }
 
         public Day(DayVersionZero lastDay)
@@ -67,6 +81,30 @@ namespace GreatDevResh.Data.Classes
             activities.Add(a4);
         }
 
+        public void ChangeRegime(RegimeClass regime)
+        {
+            Debug.Log("Changind to " + regime.Name);
+            NameOfRegime = regime.Name;
+            List<ConsistencyBaseClass> newActivities = activities.Where(activity => activity.HaveSomeProgress()).ToList();
+
+            foreach (var activity in regime.activities)
+            {
+                bool contains = false;
+                foreach (var item in newActivities)
+                {
+                    if (item.Title != activity.Title) continue;
+                    contains = true;
+                    item.CopySettings(activity, false);
+                    break;
+                }
+                if (!contains)
+                    newActivities.Add(ConsistencyBaseClass.MakeSame(activity));
+            }
+
+            activities = newActivities;
+            ++changesInd;
+        }
+
         public Day(string str, ref int ind)
         {
             ind++;
@@ -100,7 +138,7 @@ namespace GreatDevResh.Data.Classes
             return res;
         }
 
-        public float GetSportRaio()
+        public float GetSportRatio()
         {
             float ratio = 0;
             float cnt = 0;
@@ -109,8 +147,8 @@ namespace GreatDevResh.Data.Classes
             {
                 if (activities[i].CanBeCompleted())
                 {
-                    ++cnt;
-                    ratio += activities[i].GetCompleteness();
+                    cnt += activities[i].weight;
+                    ratio += activities[i].GetCompleteness() * activities[i].weight;
                 }
             }
 
@@ -131,7 +169,7 @@ namespace GreatDevResh.Data.Classes
 
         public int GetNumberOfRatio()
         {
-            float ratio = GetSportRaio();
+            float ratio = GetSportRatio();
             if (ratio < 0)
                 return -1;
 

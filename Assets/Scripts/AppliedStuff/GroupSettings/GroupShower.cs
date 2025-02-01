@@ -15,7 +15,7 @@ namespace GreatDevResh.AppliedStuff.GroupSettings
         public void UpdateList()
         {
             int ind = 0;
-            List<int> indexes = GeneralData.Instance.GroupNames.Select(pair => pair.Key).ToList();
+            List<int> indexes = GeneralData.GroupNames.Select(pair => pair.Key).ToList();
             indexes.Sort();
 
             foreach (int index in indexes)

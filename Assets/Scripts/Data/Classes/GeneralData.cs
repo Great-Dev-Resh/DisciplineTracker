@@ -7,37 +7,37 @@ using UnityEngine.Serialization;
 namespace GreatDevResh.Data.Classes
 {
     [Serializable]
-    public class GeneralData
+    public static class GeneralData
     {
-        public static GeneralData Instance;
-        
-        public MyDate startDate;
-        [FormerlySerializedAs("day")] public int startDay;
+        public static MyDate startDate;
+        [FormerlySerializedAs("day")] public static int startDay;
 
-        public List<RegimeClass> Regimes;
-        public Dictionary<int, string> GroupNames;
-        public int DefaultRegime;
-        public int MaxGroupIndex;
+        public static List<RegimeClass> Regimes;
+        public static Dictionary<int, string> GroupNames;
+        public static int DefaultRegime;
+        public static int MaxGroupIndex;
 
-        public int GroupUpdateVersion = 0;
-        public int RegimeUpdateVersion = 0;
+        public static int GroupUpdateVersion = 0;
+        public static int RegimeUpdateVersion = 0;
+
+        public static bool IsCreated { get; private set; } = false;
 
         // statistics
         // settings
 
-        public GeneralData()
+        public static void CreateNew()
         {
             Regimes = new List<RegimeClass>();
             GroupNames = new Dictionary<int, string>();
-            DefaultRegime = 0;
-            
-            Regimes.Add(new RegimeClass("Normal"));
             MaxGroupIndex = 0;
 
-            Instance = this;
+            Regimes.Add(new RegimeClass("Normal"));
+            DefaultRegime = 0;
+
+            IsCreated = true;
         }
         
-        public GeneralData(string str, ref int ind)
+        private static void CreateFromString(string str, ref int ind)
         {
             ind++;
             startDay = StringHelper.GetNumber(str, ref ind, ',');
@@ -61,10 +61,10 @@ namespace GreatDevResh.Data.Classes
             DefaultRegime = StringHelper.GetNumber(str, ref ind, ',');
             MaxGroupIndex = StringHelper.GetNumber(str, ref ind, '}');
 
-            Instance = this;
+            IsCreated = true;
         }
         
-        public override string ToString()
+        public static string ToString()
         {
             string res = "{" + startDay + "," + startDate.Month + "," + startDate.Year + "\n";
             res += StringHelper.PackList(ref Regimes);
@@ -82,20 +82,18 @@ namespace GreatDevResh.Data.Classes
 
         public static void Save()
         {
-            if (Instance is null)
+            if (!IsCreated)
                 return;
-            
-            FileDataHandler.Save("GeneralData", Instance.ToString());
+            FileDataHandler.Save("GeneralData", ToString());
         }
 
         public static void Load()
         {
             string str = FileDataHandler.Load("GeneralData");
-            Instance = null;
             if (str is null or "")
                 return;
             int ind = 0;
-            Instance = new GeneralData(str, ref ind);
+            CreateFromString(str, ref ind);
         }
     }
 }

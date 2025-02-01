@@ -6,8 +6,6 @@ using UnityEngine.UI;
 
 public class SetTable : MonoBehaviour
 {
-    [SerializeField] private Info _info;
-
     [SerializeField] private DayItem _dayPrefab;
     [SerializeField] private GameObject _emptyPrefab;
 
@@ -20,12 +18,12 @@ public class SetTable : MonoBehaviour
 
     private void Awake()
     {
-        _info.Init();
+        Info.Init();
         
         _gridLayoutGroup = GetComponent<GridLayoutGroup>();
         rectTransform = GetComponent<RectTransform>();
 
-        lastNotAddedMonth = new MyDate(ref _info.now);
+        lastNotAddedMonth = new MyDate(ref Info.now);
 
         int day = DateController.Day;
         int weekDay = DateController.DayOfWeek;
@@ -35,20 +33,20 @@ public class SetTable : MonoBehaviour
             Instantiate(_emptyPrefab, transform);
         }
 
-        for (int i = day; i > 0 && (lastNotAddedMonth > _info.generalData.startDate || i >= _info.generalData.startDay); --i)
+        for (int i = day; i > 0 && (lastNotAddedMonth > GeneralData.startDate || i >= GeneralData.startDay); --i)
         {
             var newday = Instantiate(_dayPrefab, transform);
-            if (_info.Store[lastNotAddedMonth.Int()].days[i] is null)
+            if (Info.Store[lastNotAddedMonth.Int()].days[i] is null)
             {
-                _info.Store[lastNotAddedMonth.Int()].days[i] = new Day();
+                Info.Store[lastNotAddedMonth.Int()].days[i] = new Day();
             }
             
             newday.Init(lastNotAddedMonth, i, 
-                _info.Store[lastNotAddedMonth.Int()].days[i], _info.TryGetPreviousDay(lastNotAddedMonth, i));
+                Info.Store[lastNotAddedMonth.Int()].days[i], Info.TryGetPreviousDay(lastNotAddedMonth, i));
             if (i == day)
                 currentDay = newday;
         }
-        _info.SaveToday();
+        Info.SaveToday();
         
         RefreshSizeOfContent();
     }
@@ -90,23 +88,23 @@ public class SetTable : MonoBehaviour
     private void TryGetElements()
     {
         lastNotAddedMonth.Month--;
-        if (lastNotAddedMonth < _info.generalData.startDate)
+        if (lastNotAddedMonth < GeneralData.startDate)
             return;
         
-        _info.LoadLastMonth(lastNotAddedMonth);
-        if (!_info.Store.ContainsKey(lastNotAddedMonth.Int()) || _info.Store[lastNotAddedMonth.Int()] is null)
+        Info.LoadLastMonth(lastNotAddedMonth);
+        if (!Info.Store.ContainsKey(lastNotAddedMonth.Int()) || Info.Store[lastNotAddedMonth.Int()] is null)
         {
-            _info.CreateMonthData(lastNotAddedMonth);
+            Info.CreateMonthData(lastNotAddedMonth);
         }
         for (int i = lastNotAddedMonth.AmountOfDays(); i >= 1; --i)
         {
-            if (lastNotAddedMonth.Int() == _info.generalData.startDate.Int() &&
-                i < _info.generalData.startDay)
+            if (lastNotAddedMonth.Int() == GeneralData.startDate.Int() &&
+                i < GeneralData.startDay)
                 break;
             
             var newday = Instantiate(_dayPrefab, transform);
-            newday.Init(lastNotAddedMonth, i, _info.Store[lastNotAddedMonth.Int()].days[i],
-                _info.TryGetPreviousDay(lastNotAddedMonth, i));
+            newday.Init(lastNotAddedMonth, i, Info.Store[lastNotAddedMonth.Int()].days[i],
+                Info.TryGetPreviousDay(lastNotAddedMonth, i));
         }
         
         RefreshSizeOfContent();

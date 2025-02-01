@@ -37,6 +37,8 @@ namespace GreatDevResh.AppliedStuff
             lowerRange.Set(scheduleClass.section.lowerRange);
             upperRange.Set(scheduleClass.section.upperRange);
             defaultValue.Set(scheduleClass.defaultValue);
+            
+            Weight_IF.SetNumber(scheduleClass.weight);
 
             isUpdatingPicture = false;
         }
@@ -51,23 +53,23 @@ namespace GreatDevResh.AppliedStuff
         {
             if (isUpdatingPicture)
                 return;
-            isUpdatingPicture = true;
             
-            Debug.Log("End editing");
-
             if (lowerBoundary.time == scheduleClass.section.lowerBoundary &&
                 upperBoundary.time == scheduleClass.section.upperBoundary &&
                 lowerRange.time == scheduleClass.section.lowerRange &&
                 upperRange.time == scheduleClass.section.upperRange &&
-                defaultValue.time == scheduleClass.defaultValue)
+                defaultValue.time == scheduleClass.defaultValue &&
+                Weight_IF.Value == scheduleClass.weight)
                 return;
+            
+            isUpdatingPicture = true;
 
             scheduleClass.section.lowerBoundary = lowerBoundary.time;
             scheduleClass.section.upperBoundary = upperBoundary.time;
             scheduleClass.section.lowerRange = lowerRange.time;
             scheduleClass.section.upperRange = upperRange.time;
             scheduleClass.defaultValue = defaultValue.time;
-            
+            scheduleClass.weight = Weight_IF.Value;
             
             GeneralData.Save();
 

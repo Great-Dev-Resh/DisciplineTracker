@@ -27,7 +27,7 @@
 
         public override string ToString()
         {
-            return "Ch{" + base.ToString() + "," + (DefaultValue ? 1 : 0) + "}";
+            return "Ch{" + base.ToString() + "," + (Completed ? 1 : 0) + "," + (DefaultValue ? 1 : 0) + "}";
         }
 
         protected override void BuildFromStr(string str, ref int ind)
@@ -35,16 +35,22 @@
             ind += 3;
             base.BuildFromStr(str, ref ind);
             ind++;
+            Completed = str[ind] == '1';
+            ind += 2;
             DefaultValue = str[ind] == '1';
             ind += 2;
         }
 
-        public override void CopySettings(ConsistencyBaseClass other)
+        public override void CopySettings(ConsistencyBaseClass other, bool resetValue = true)
         {
             base.CopySettings(other);
             if (other is not CheckBoxClass checkBoxClass)
                 return;
             DefaultValue = checkBoxClass.DefaultValue;
+            if (resetValue)
+                Completed = DefaultValue;
         }
+
+        public override bool HaveSomeProgress() => Completed != DefaultValue;
     }
 }

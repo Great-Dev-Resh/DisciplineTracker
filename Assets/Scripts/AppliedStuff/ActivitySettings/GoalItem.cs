@@ -15,6 +15,7 @@ namespace GreatDevResh.AppliedStuff
         
         [SerializeField] protected TMP_Text Title;
         [SerializeField] protected GroupDropDown GroupDropDown;
+        [SerializeField] protected NumberInputField Weight_IF;
         
         protected virtual void UpdatePicture()
         {

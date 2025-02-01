@@ -2,11 +2,11 @@
 using System.IO;
 using UnityEngine;
 
-public class FileDataHandler
+public static class FileDataHandler
 {
     private static string dataDirPath;
 
-    public FileDataHandler(string _dataDirPath)
+    public static void SetPath(string _dataDirPath)
     {
         dataDirPath = _dataDirPath;
     }

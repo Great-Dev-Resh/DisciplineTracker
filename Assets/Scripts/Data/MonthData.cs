@@ -11,7 +11,7 @@ public class MonthData
 
     public List<Day> days;
 
-    public MonthData(int count)
+    public MonthData(int count = 32)
     {
         days = new List<Day>(new Day[count]);
     }

@@ -19,8 +19,8 @@ namespace GreatDevResh.AppliedStuff.RegimeSettings
 
         public void Create()
         {
-            GeneralData.Instance.Regimes.Add(new RegimeClass(titleInputField.text));
-            ++GeneralData.Instance.RegimeUpdateVersion;
+            GeneralData.Regimes.Add(new RegimeClass(titleInputField.text));
+            ++GeneralData.RegimeUpdateVersion;
             GeneralData.Save();
             
             RegimeShower.UpdateList();

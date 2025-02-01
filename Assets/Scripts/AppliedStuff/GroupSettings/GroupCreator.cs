@@ -16,8 +16,8 @@ namespace GreatDevResh.AppliedStuff.GroupSettings
 
         public void Create()
         {
-            GeneralData.Instance.GroupNames.Add(++GeneralData.Instance.MaxGroupIndex, titleInputField.text);
-            GeneralData.Instance.GroupUpdateVersion++;
+            GeneralData.GroupNames.Add(++GeneralData.MaxGroupIndex, titleInputField.text);
+            GeneralData.GroupUpdateVersion++;
             GeneralData.Save();
             
             GroupShower.UpdateList();

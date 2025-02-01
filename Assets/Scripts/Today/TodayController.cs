@@ -10,7 +10,6 @@ using UnityEngine.UI;
 
 public class TodayController : MonoBehaviour
 {
-    [SerializeField] private Info _info;
     [SerializeField] private SetTable _setTable;
     
     [SerializeField] private TMP_Text bonusText;
@@ -74,7 +73,7 @@ public class TodayController : MonoBehaviour
         bonusText.text = today.bonusForSport.ToString();
         // UpdateButtonsImages();
 
-        _info.SaveToday();
+        Info.SaveToday();
         _setTable.currentDay?.UpdateValues(today);
     }
 
@@ -134,9 +133,9 @@ public class TodayController : MonoBehaviour
 
     private void Awake()
     {
-        _info.Init();
+        Info.Init();
 
-        today = _info.Store[_info.now.Int()].days[DateController.Day];
+        today = Info.Store[Info.now.Int()].days[DateController.Day];
         if (today is null)
         {
             Debug.LogErrorFormat("today missing!");

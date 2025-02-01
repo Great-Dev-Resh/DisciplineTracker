@@ -20,11 +20,19 @@ namespace GreatDevResh.AppliedStuff
             UpdatePicture();
         }
 
+        private bool isUpdatingPicture = false;
         protected override void UpdatePicture()
         {
+            if (isUpdatingPicture)
+                return;
+            isUpdatingPicture = true;
+            
             Title.text = checkBoxClass.Title;
             Toggle_defaultValue.isOn = checkBoxClass.DefaultValue;
             UpdateGroupVisual();
+            
+            Weight_IF.SetNumber(checkBoxClass.weight);
+            isUpdatingPicture = false;
         }
         
         protected override void UpdateGroupVisual()
@@ -36,10 +44,13 @@ namespace GreatDevResh.AppliedStuff
 
         public override void OnEndChanging()
         {
-            if (Toggle_defaultValue.isOn == checkBoxClass.DefaultValue)
+            if (isUpdatingPicture)
+                return;
+            if (Toggle_defaultValue.isOn == checkBoxClass.DefaultValue && checkBoxClass.weight == Weight_IF.Value)
                 return;
 
             checkBoxClass.DefaultValue = Toggle_defaultValue.isOn;
+            checkBoxClass.weight = Weight_IF.Value;
             GeneralData.Save();
         }
         

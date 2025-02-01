@@ -21,15 +21,19 @@ namespace GreatDevResh.Data
             defaultValue = 0;
         }
         
-        public void SetValue(int _value) => value = Mathf.Max(_value, 0);
+        public void SetValue(int _value) => value = Mathf.Min(Mathf.Max(_value, 0), 9999999);
         public void AddValue(int _value) => SetValue(_value + value);
         public void SetSection(GoalSection _section) => section = _section;
 
         public int[] GetChanges()
         {
-            int[] changes = {1, 10, 100};
             int mxValue = section.GetMaxNumber();
-            while (changes[2] * 17 <= mxValue)
+            if (mxValue < 13)
+                return new int[] { 1 };
+            if (mxValue < 130)
+                return new int[]{ 1, 10 };
+            int[] changes = {1, 10, 100};
+            while (changes[2] * 13 <= mxValue)
                 changes[2] *= 10;
             changes[1] = changes[2] / 10;
             changes[0] = changes[1] / 10;
@@ -52,15 +56,15 @@ namespace GreatDevResh.Data
             switch (section.GetType())
             {
                 case GoalSectionEnum.bigger:
-                    return value + " > " + section.lowerBoundary;
+                    return "<b>" + value + "</b> > " + section.lowerBoundary;
                 case GoalSectionEnum.smaller:
-                    return value + " < " + section.upperBoundary;
+                    return "<b>" + value + "</b> < " + section.upperBoundary;
                 case GoalSectionEnum.range:
-                    return section.lowerBoundary + " < " + value + " < " + section.upperBoundary;
+                    return section.lowerBoundary + " < <b>" + value + "</b> < " + section.upperBoundary;
                 case GoalSectionEnum.antiRange:
-                    return section.lowerBoundary + " > " + value + " > " + section.upperBoundary;
+                    return section.lowerBoundary + " > <b>" + value + "</b> > " + section.upperBoundary;
                 default:
-                    return " < " + value + " > ";
+                    return " < <b>" + value + "</b> > ";
             }
         }
 
@@ -92,13 +96,16 @@ namespace GreatDevResh.Data
             defaultValue = StringHelper.GetNumber(str, ref ind, '}');
         }
 
-        public override void CopySettings(ConsistencyBaseClass other)
+        public override void CopySettings(ConsistencyBaseClass other, bool resetValue = true)
         {
             base.CopySettings(other);
             if (other is not AmountClass amountClass) return;
             section = new GoalSection(amountClass.section);
             defaultValue = amountClass.defaultValue;
-            value = defaultValue;
+            if (resetValue)
+                value = defaultValue;
         }
+
+        public override bool HaveSomeProgress() => value != defaultValue;
     }
 }

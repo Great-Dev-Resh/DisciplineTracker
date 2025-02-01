@@ -98,7 +98,7 @@ namespace GreatDevResh.Data
             return GoalSectionEnum.antiRange;
         }
 
-        public int GetMaxNumber() => Mathf.Max(lowerBoundary, upperBoundary);
+        public int GetMaxNumber() => Mathf.Max(lowerBoundary, upperBoundary) == -1 ? 140 : Mathf.Max(lowerBoundary, upperBoundary);
 
         public int GetLowerBorderMinusRange() => lowerBoundary - lowerRange;
         public int GetUpperBorderPlusRange() => upperBoundary + upperRange;

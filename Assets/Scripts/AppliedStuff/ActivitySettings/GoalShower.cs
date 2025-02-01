@@ -37,7 +37,7 @@ namespace GreatDevResh.AppliedStuff
 
         public void UpdateList()
         {
-            regime = GeneralData.Instance.Regimes[currentRegimeIndex];
+            regime = GeneralData.Regimes[currentRegimeIndex];
 
             int amountInd = 0;
             int scheduleInd = 0;

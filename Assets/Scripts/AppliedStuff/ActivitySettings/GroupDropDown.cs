@@ -28,7 +28,7 @@ namespace GreatDevResh.AppliedStuff
             {
                 if (decipheringForIndexes is null)
                     UpdateList();
-                if (currentIndexInDropDown < 0 || currentIndexInDropDown > decipheringForIndexes.Count)
+                if (currentIndexInDropDown < 0 || currentIndexInDropDown >= decipheringForIndexes.Count)
                 {
                     currentIndexInDropDown = 0;
                     UpdateList();
@@ -47,17 +47,17 @@ namespace GreatDevResh.AppliedStuff
 
         public void UpdateList()
         {
-            if (GroupUpdateVersion != GeneralData.Instance.GroupUpdateVersion)
+            if (GroupUpdateVersion != GeneralData.GroupUpdateVersion)
             {
-                dict = GeneralData.Instance.GroupNames.OrderBy(x => x.Key).ToDictionary(x => x.Key, x => x.Value);
-                GroupUpdateVersion = GeneralData.Instance.GroupUpdateVersion;
+                dict = GeneralData.GroupNames.OrderBy(x => x.Key).ToDictionary(x => x.Key, x => x.Value);
+                GroupUpdateVersion = GeneralData.GroupUpdateVersion;
             }
 
             if (localUpdateVersion == GroupUpdateVersion)
                 return;
             localUpdateVersion = GroupUpdateVersion;
 
-            int selectedItem = decipheringForIndexes is not null ? Index : 0;
+            int selectedItem =  decipheringForIndexes is not null && currentIndexInDropDown != 0 ? Index : 0;
 
             Dropdown.options = new List<TMP_Dropdown.OptionData>();
             decipheringForIndexes = new List<int>();

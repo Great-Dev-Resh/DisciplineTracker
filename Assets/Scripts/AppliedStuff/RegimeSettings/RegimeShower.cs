@@ -17,7 +17,7 @@ namespace GreatDevResh.AppliedStuff.RegimeSettings
         public void UpdateList()
         {
             int ind = 0;
-            for (; ind < GeneralData.Instance.Regimes.Count; ++ind)
+            for (; ind < GeneralData.Regimes.Count; ++ind)
             {
                 if (ind >= items.Count)
                 {
@@ -38,7 +38,7 @@ namespace GreatDevResh.AppliedStuff.RegimeSettings
                 ++ind;
             }
 
-            if (GeneralData.Instance.Regimes.Count == 1)
+            if (GeneralData.Regimes.Count == 1)
                 items[0].DisableDeleteBtn();
         }
         
@@ -61,8 +61,8 @@ namespace GreatDevResh.AppliedStuff.RegimeSettings
 
         public void ConfirmDeleting()
         {
-            GeneralData.Instance.Regimes.RemoveAt(deletingElementIndex);
-            GeneralData.Instance.RegimeUpdateVersion++;
+            GeneralData.Regimes.RemoveAt(deletingElementIndex);
+            GeneralData.RegimeUpdateVersion++;
             GeneralData.Save();
             UpdateList();
         }

@@ -6,6 +6,9 @@ namespace GreatDevResh.Data
     {
         public int minutes { get; private set; }
 
+        public int ResultHours => minutes / 60;
+        public int ResultMinutes => minutes % 60;
+
         public TimeClass(int _minutes)
         {
             minutes = _minutes;

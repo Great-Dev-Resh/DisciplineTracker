@@ -48,6 +48,8 @@ namespace GreatDevResh.AppliedStuff
             IF_upperRange.text = amountClass.section.GetUpperBorderPlusRange().ToString();
 
             IF_defaultValue.text = amountClass.defaultValue.ToString();
+            
+            Weight_IF.SetNumber(amountClass.weight);
 
             isUpdatingPicture = false;
         }
@@ -88,7 +90,7 @@ namespace GreatDevResh.AppliedStuff
 
             if (amountClass.defaultValue == defaultValue && amountClass.section.lowerBoundary == lowerBoundary &&
                 amountClass.section.upperBoundary == upperBoundary && amountClass.section.lowerRange == lowerRange &&
-                amountClass.section.upperRange == upperRange)
+                amountClass.section.upperRange == upperRange && amountClass.weight == Weight_IF.Value)
             {
                 UpdatePicture();
                 return;
@@ -99,6 +101,7 @@ namespace GreatDevResh.AppliedStuff
             amountClass.section.upperBoundary = upperBoundary;
             amountClass.section.lowerRange = lowerRange;
             amountClass.section.upperRange = upperRange;
+            amountClass.weight = Weight_IF.Value;
             
             UpdatePicture();
             GeneralData.Save();

@@ -28,7 +28,7 @@ namespace GreatDevResh.AppliedStuff.RegimeSettings
 
         private void UpdateText()
         {
-            Title.text = GeneralData.Instance.Regimes[index].Name;
+            Title.text = GeneralData.Regimes[index].Name;
         }
 
         public void Delete()

@@ -11,7 +11,6 @@ namespace GreatDevResh.AppliedStuff
 {
     public class ActivityCreator : MonoBehaviour
     {
-        [SerializeField] private Info _info;
         private RegimeClass currentRegime; // here day is not changing
         [SerializeField] private GoalShower GoalShower;
 
@@ -163,7 +162,7 @@ namespace GreatDevResh.AppliedStuff
 
         public void StartCreating()
         {
-            currentRegime = GeneralData.Instance.Regimes[regimeCurrentIndex];
+            currentRegime = GeneralData.Regimes[regimeCurrentIndex];
 
             whatWeCreating = -1;
             ImageOfBtnNext.color = ColorOfBtnNotActive;

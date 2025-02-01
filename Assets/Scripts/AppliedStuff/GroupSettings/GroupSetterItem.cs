@@ -27,13 +27,13 @@ namespace GreatDevResh.AppliedStuff.GroupSettings
 
         private void UpdateText()
         {
-            Title.text = GeneralData.Instance.GroupNames[index];
+            Title.text = GeneralData.GroupNames[index];
         }
 
         public void Delete()
         {
-            GeneralData.Instance.GroupNames.Remove(index);
-            GeneralData.Instance.GroupUpdateVersion++;
+            GeneralData.GroupNames.Remove(index);
+            GeneralData.GroupUpdateVersion++;
             GeneralData.Save();
             gameObject.SetActive(false);
         }

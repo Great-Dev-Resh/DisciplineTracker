@@ -7,23 +7,17 @@ using GreatDevResh.MultiUseful;
 using UnityEngine;
 using UnityEngine.Serialization;
 
-public class Info : MonoBehaviour
+public static class Info
 {
-    [SerializeField] private GameObject[] OnFirstTimeDisable;
-    [SerializeField] private GameObject[] OnFirstTimeEnable;
+    public static bool IsFirstStart = false;
     
-    public Dictionary<int, MonthData> Store { get; private set; }
+    public static Dictionary<int, MonthData> Store { get; private set; }
     
-    private FileDataHandler fileDataHandler;
+    public static MyDate now;
     
-    public GeneralData generalData;
-    public FourGoals fourGoals;
-    public MyDate now;
-    
-    private int currentDay;
-    private bool _isInit = false;
+    private static bool _isInit = false;
 
-    public void SaveToday()
+    public static void SaveToday()
     {
         MonthData currentMonth = Store[now.Int()];
         if (currentMonth is null)
@@ -33,16 +27,16 @@ public class Info : MonoBehaviour
         FileDataHandler.Save(now.To_String(), json);
     }
 
-    public MyDate LoadLastMonth(MyDate _date)
+    public static MyDate LoadLastMonth(MyDate _date)
     {
         var date = new MyDate(ref _date);
-        if (date.Year < generalData.startDate.Year || 
-            date.Year == generalData.startDate.Year && date.Month < generalData.startDate.Month)
+        if (date.Year < GeneralData.startDate.Year || 
+            date.Year == GeneralData.startDate.Year && date.Month < GeneralData.startDate.Month)
             return null;
 
         string json = FileDataHandler.Load(date.To_String());
-        while ((date.Year > generalData.startDate.Year ||
-                date.Year == generalData.startDate.Year && date.Month > generalData.startDate.Month) &&
+        while ((date.Year > GeneralData.startDate.Year ||
+                date.Year == GeneralData.startDate.Year && date.Month > GeneralData.startDate.Month) &&
                json is null or "")
         {
             --date.Month;
@@ -56,22 +50,21 @@ public class Info : MonoBehaviour
             return date;
 
         Store.Add(date.Int(), new MonthData(json));
-        print(date.Month + " " + date.Year);
+        // print(date.Month + " " + date.Year);
         return date;
     }
 
-    public void Init()
+    public static void Init()
     {
         if (_isInit)
             return;
         _isInit = true;
         
-        fileDataHandler = new FileDataHandler(Application.persistentDataPath);
+        FileDataHandler.SetPath(Application.persistentDataPath);
         Store = new Dictionary<int, MonthData>();
         
         now = new MyDate(DateController.Year, DateController.Month);
         GetGeneralData();
-        GetGoalsData();
 
         MyDate lastDate = LoadLastMonth(now);
         Day lastDay = null;
@@ -83,7 +76,7 @@ public class Info : MonoBehaviour
             now.Month++;
 
             int dayBefore = DateController.Day;
-            while (lastDay is null && dayBefore > 1 && (generalData.startDate.Int() != now.Int() || generalData.startDay != dayBefore))
+            while (lastDay is null && dayBefore > 1 && (GeneralData.startDate.Int() != now.Int() || GeneralData.startDay != dayBefore))
                 lastDay = Store[now.Int()].days[--dayBefore];
             skip = dayBefore < DateController.Day - 1;
         }
@@ -100,86 +93,38 @@ public class Info : MonoBehaviour
         
         if (!Store.ContainsKey(now.Int()))
         {
-            print(now.Int());
             Store[now.Int()] = new MonthData(32);
         }
 
         if (Store[now.Int()].days[DateController.Day] is null)
         {
-            fourGoals.UpdateSeries(lastDay, skip);
-            SaveGoals();
-            Store[now.Int()].days[DateController.Day] = new Day(lastDay);
+            Store[now.Int()].days[DateController.Day] = new Day(GeneralData.Regimes[GeneralData.DefaultRegime]);
             SaveToday();
         }
-
-        currentDay = DateController.Day;
-        
-        // for (var cur = new MyDate(ref now); cur >= generalData.startDate; --cur.Month)
-        // {
-        //     if (cur.Int() == now.Int())
-        //         continue;
-        //     if (Store.ContainsKey(cur.Int()) && Store[cur.Int()].days[cur.AmountOfDays()] is not null)
-        //         break;
-        //     if (Store.ContainsKey(cur.Int()))
-        //     {
-        //         CreateMonthData(cur);
-        //         break;
-        //     }
-        //     CreateMonthData(cur);
-        // }
     }
 
-    private void GetGeneralData()
+    private static void GetGeneralData()
     {
         GeneralData.Load();
-        generalData = GeneralData.Instance;
 
-        if (generalData is null)
+        if (!GeneralData.IsCreated)
         {
-            generalData = new GeneralData();
-            generalData.startDate = new MyDate(now.Year, now.Month);
+            GeneralData.CreateNew();
+            GeneralData.startDate = new MyDate(now.Year, now.Month);
             // generalData.startDate.Month -= 3;
-            generalData.startDay = DateController.Day;
+            GeneralData.startDay = DateController.Day;
             // generalData.day -= 1;
             
             GeneralData.Save();
 
-            foreach (var obj in OnFirstTimeDisable)
-                obj.SetActive(false);
-            foreach (var obj in OnFirstTimeEnable)
-                obj.SetActive(true);
-        }
-    }
-    
-    private void GetGoalsData()
-    {
-        string goalDataStr = PlayerPrefs.GetString("GoalsData");
-        fourGoals = null;
-        if (!string.IsNullOrEmpty(goalDataStr))
-        {
-            fourGoals = JsonUtility.FromJson<FourGoals>(goalDataStr);
-        }
-
-        if (fourGoals is null)
-        {
-            fourGoals = new FourGoals();
-
-            SaveGoals();
+            IsFirstStart = true;
         }
     }
 
-    public void SaveGoals()
-    {
-        string goalDataStr = JsonUtility.ToJson(fourGoals, true);
-        PlayerPrefs.SetString("GoalsData", goalDataStr);
-        PlayerPrefs.Save();
-        // print(goalDataStr);
-    }
-
-    public void CreateMonthData(MyDate data)
+    public static void CreateMonthData(MyDate data)
     {
         if (!Store.ContainsKey(data.Int()))
-            Store[data.Int()] = new MonthData(32);
+            Store[data.Int()] = new MonthData();
         for (int i = 1; i <= 31; ++i)
         {
             if (Store[data.Int()].days[i] is null)
@@ -190,11 +135,11 @@ public class Info : MonoBehaviour
         FileDataHandler.Save(data.To_String(), json);
     }
 
-    public Colors GetLastMonthColors()
+    public static Colors GetLastMonthColors()
     {
         Colors lastMonthColors = new Colors();
 
-        for (int i = currentDay - 1; i > 0 && (generalData.startDate.Int() != now.Int() || i >= generalData.startDay); --i)
+        for (int i = DateController.Day - 1; i > 0 && (GeneralData.startDate.Int() != now.Int() || i >= GeneralData.startDay); --i)
         {
             if (Store[now.Int()].days[i] is null)
                 continue;
@@ -206,8 +151,8 @@ public class Info : MonoBehaviour
         MyDate lastMonthDate = new MyDate(now.Year, now.Month);
         lastMonthDate.Month--;
         for (int i = lastMonthDate.AmountOfDays();
-             i >= currentDay && (generalData.startDate < lastMonthDate || 
-                                generalData.startDate.Int() == lastMonthDate.Int() && i >= generalData.startDay); --i)
+             i >= DateController.Day && (GeneralData.startDate < lastMonthDate || 
+                                         GeneralData.startDate.Int() == lastMonthDate.Int() && i >= GeneralData.startDay); --i)
         {
             if (Store[lastMonthDate.Int()].days[i] is null)
                 continue;
@@ -219,9 +164,9 @@ public class Info : MonoBehaviour
         return lastMonthColors;
     }
 
-    public Day TryGetPreviousDay(MyDate _date, int day)
+    public static Day TryGetPreviousDay(MyDate _date, int day)
     {
-        if (_date.Int() == generalData.startDate.Int() && day <= generalData.startDay)
+        if (_date.Int() == GeneralData.startDate.Int() && day <= GeneralData.startDay)
             return null;
 
         MyDate date = new MyDate(ref _date);
@@ -242,35 +187,12 @@ public class Info : MonoBehaviour
         return Store[date.Int()].days[day];
     }
 
-    private void Awake()
-    {
-        Init();
-    }
-
-    private void Update()
-    {
-        if (DateController.Day != currentDay)
-            Application.Quit();
-    }
-
-    [ContextMenu("Clear General Data")]
-    public void ClearGeneralData()
-    {
-        PlayerPrefs.DeleteKey("GeneralData");
-        PlayerPrefs.DeleteKey("GoalsData");
-        PlayerPrefs.DeleteKey("MotivationHelper");
-    }
-
-    // public void TempFix()
+    // [ContextMenu("Clear General Data")]
+    // public void ClearGeneralData()
     // {
-    //     fourGoals.currentSeries = new Colors();
-    //     fourGoals.maxSeries = new Colors();
-    //     fourGoals.inTotal = new Colors();
-    //     fourGoals.currentSeries.c = new[] { 1, 1, 1, 1, 1, 0, 0, 0, 0 };
-    //     fourGoals.maxSeries.c = new[] { 1, 1, 1, 1, 1, 0, 0, 0, 0 };
-    //     fourGoals.inTotal.c = new[] { 1, 1, 1, 1, 1, 0, 0, 0, 0 };
-    //     
-    //     SaveGoals();
+    //     PlayerPrefs.DeleteKey("GeneralData");
+    //     PlayerPrefs.DeleteKey("GoalsData");
+    //     PlayerPrefs.DeleteKey("MotivationHelper");
     // }
 }
 
@@ -366,44 +288,44 @@ public class MyDate
     }
 }
 
-[Serializable]
-public class FourGoals
-{
-    public Colors currentSeries = new Colors();
-    public Colors maxSeries = new Colors();
-    public Colors inTotal = new Colors();
-    
-    // need here dictionary for every activity - sum of all period and last month and last year
-    // maybe achivements here
-    
-    public FourGoals(int v1 = 0, int v2 = 0, int v3 = 0, int v4 = 0)
-    { }
-
-    public void UpdateSeries(Day lastDay, bool wasSkip)
-    {
-        if (lastDay is not null)
-        {
-            int res = lastDay.GetNumberOfRatio();
-
-            for (int i = 0; i <= res; ++i)
-            {
-                currentSeries.c[i]++;
-                inTotal.c[i]++;
-                if (maxSeries.c[i] < currentSeries.c[i])
-                    maxSeries.c[i] = currentSeries.c[i];
-            }
-            for (int i = res + 1; i < 9; ++i)
-            {
-                currentSeries.c[i] = 0;
-            }
-        }
-
-        if (!wasSkip) return;
-        
-        for (int i = 0; i < 9; ++i)
-            currentSeries.c[i] = 0;
-    }
-}
+// [Serializable]
+// public class FourGoals
+// {
+//     public Colors currentSeries = new Colors();
+//     public Colors maxSeries = new Colors();
+//     public Colors inTotal = new Colors();
+//     
+//     // need here dictionary for every activity - sum of all period and last month and last year
+//     // maybe achivements here
+//     
+//     public FourGoals(int v1 = 0, int v2 = 0, int v3 = 0, int v4 = 0)
+//     { }
+//
+//     public void UpdateSeries(Day lastDay, bool wasSkip)
+//     {
+//         if (lastDay is not null)
+//         {
+//             int res = lastDay.GetNumberOfRatio();
+//
+//             for (int i = 0; i <= res; ++i)
+//             {
+//                 currentSeries.c[i]++;
+//                 inTotal.c[i]++;
+//                 if (maxSeries.c[i] < currentSeries.c[i])
+//                     maxSeries.c[i] = currentSeries.c[i];
+//             }
+//             for (int i = res + 1; i < 9; ++i)
+//             {
+//                 currentSeries.c[i] = 0;
+//             }
+//         }
+//
+//         if (!wasSkip) return;
+//         
+//         for (int i = 0; i < 9; ++i)
+//             currentSeries.c[i] = 0;
+//     }
+// }
 
 [Serializable]
 public class Colors

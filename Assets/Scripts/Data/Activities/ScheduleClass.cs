@@ -61,12 +61,16 @@ namespace GreatDevResh.Data
             ind++;
         }
 
-        public override void CopySettings(ConsistencyBaseClass other)
+        public override void CopySettings(ConsistencyBaseClass other, bool resetValue = true)
         {
             base.CopySettings(other);
             if (other is not ScheduleClass scheduleClass) return;
-            value = defaultValue = scheduleClass.defaultValue;
+            defaultValue = scheduleClass.defaultValue;
             section = new TimeSection(scheduleClass.section);
+            if (resetValue)
+                value = defaultValue;
         }
+
+        public override bool HaveSomeProgress() => value != defaultValue;
     }
 }

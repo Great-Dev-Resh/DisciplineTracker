@@ -13,7 +13,7 @@ namespace GreatDevResh.Data
         {
             get
             {
-                if (_groupIndex != 0 && !GeneralData.Instance.GroupNames.ContainsKey(_groupIndex))
+                if (_groupIndex != 0 && !GeneralData.GroupNames.ContainsKey(_groupIndex))
                     _groupIndex = 0;
                 return _groupIndex;
             }
@@ -30,20 +30,11 @@ namespace GreatDevResh.Data
             weight = 1;
         }
 
-        public virtual float GetCompleteness()
-        {
-            return 1;
-        }
+        public virtual float GetCompleteness() => 1;
 
-        public virtual bool CanBeCompleted()
-        {
-            return true;
-        }
+        public virtual bool CanBeCompleted() => true;
 
-        public virtual string GetStringOfCompleteness()
-        {
-            return ":(";
-        }
+        public virtual string GetStringOfCompleteness() => ":(";
 
         public virtual int IsHaveProgress(ConsistencyBaseClass previous) => 0;
         
@@ -88,9 +79,13 @@ namespace GreatDevResh.Data
             return res;
         }
 
-        public virtual void CopySettings(ConsistencyBaseClass other)
+        public virtual void CopySettings(ConsistencyBaseClass other, bool resetValue = true)
         {
             Title = other.Title;
+            weight = other.weight;
+            groupIndex = other.groupIndex;
         }
+
+        public virtual bool HaveSomeProgress() => false;
     }
 }
