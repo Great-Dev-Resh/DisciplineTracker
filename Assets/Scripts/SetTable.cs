@@ -94,7 +94,7 @@ public class SetTable : MonoBehaviour
         Info.LoadLastMonth(lastNotAddedMonth);
         if (!Info.Store.ContainsKey(lastNotAddedMonth.Int()) || Info.Store[lastNotAddedMonth.Int()] is null)
         {
-            Info.CreateMonthData(lastNotAddedMonth);
+            Info.CheckForDate(lastNotAddedMonth);
         }
         for (int i = lastNotAddedMonth.AmountOfDays(); i >= 1; --i)
         {

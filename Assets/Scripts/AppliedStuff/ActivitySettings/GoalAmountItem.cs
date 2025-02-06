@@ -57,7 +57,7 @@ namespace GreatDevResh.AppliedStuff
         protected override void UpdateGroupVisual()
         {
             if (amountClass is not null)
-                GroupDropDown.SetSelectedItem(amountClass.groupIndex);
+                GroupDropDown.SetSelectedItem(amountClass.group);
         }
 
         public void OnValueChanged()
@@ -107,9 +107,9 @@ namespace GreatDevResh.AppliedStuff
             GeneralData.Save();
         }
 
-        public override void ChangeGroup(int newInd)
+        public override void ChangeGroup(string newGroup)
         {
-            amountClass.groupIndex = newInd;
+            amountClass.group = newGroup;
             GeneralData.Save();
         }
 

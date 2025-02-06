@@ -46,7 +46,7 @@ namespace GreatDevResh.AppliedStuff
         protected override void UpdateGroupVisual()
         {
             if (scheduleClass is not null)
-                GroupDropDown.SetSelectedItem(scheduleClass.groupIndex);
+                GroupDropDown.SetSelectedItem(scheduleClass.group);
         }
 
         public override void OnEndChanging()
@@ -76,9 +76,9 @@ namespace GreatDevResh.AppliedStuff
             isUpdatingPicture = false;
         }
         
-        public override void ChangeGroup(int newInd)
+        public override void ChangeGroup(string newGroup)
         {
-            scheduleClass.groupIndex = newInd;
+            scheduleClass.group = newGroup;
             GeneralData.Save();
         }
     }

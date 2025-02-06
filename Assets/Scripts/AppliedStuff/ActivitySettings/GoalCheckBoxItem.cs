@@ -38,7 +38,7 @@ namespace GreatDevResh.AppliedStuff
         protected override void UpdateGroupVisual()
         {
             if (checkBoxClass is not null)
-                GroupDropDown.SetSelectedItem(checkBoxClass.groupIndex);
+                GroupDropDown.SetSelectedItem(checkBoxClass.group);
         }
 
 
@@ -54,9 +54,9 @@ namespace GreatDevResh.AppliedStuff
             GeneralData.Save();
         }
         
-        public override void ChangeGroup(int newInd)
+        public override void ChangeGroup(string newGroup)
         {
-            checkBoxClass.groupIndex = newInd;
+            checkBoxClass.group = newGroup;
             GeneralData.Save();
         }
     }

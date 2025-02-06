@@ -15,10 +15,8 @@ namespace GreatDevResh.AppliedStuff.GroupSettings
         public void UpdateList()
         {
             int ind = 0;
-            List<int> indexes = GeneralData.GroupNames.Select(pair => pair.Key).ToList();
-            indexes.Sort();
 
-            foreach (int index in indexes)
+            while (ind < GeneralData.GroupNames.Count)
             {
                 if (ind >= items.Count)
                 {
@@ -30,7 +28,7 @@ namespace GreatDevResh.AppliedStuff.GroupSettings
                 }
                 
                 items[ind].transform.SetSiblingIndex(ind);
-                items[ind].Init(index);
+                items[ind].Init(ind);
 
                 ind++;
             }

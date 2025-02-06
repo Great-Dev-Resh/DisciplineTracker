@@ -22,6 +22,8 @@ namespace GreatDevResh.AppliedStuff.TodayActivity
         private List<TodayScheduleItem> scheduleItems;
         private List<TodayCheckBoxItem> checkBoxItems;
 
+        private int regimeUpdateVersion = -1;
+
         public void UpdateList()
         {
             int amountInd = 0;
@@ -91,8 +93,19 @@ namespace GreatDevResh.AppliedStuff.TodayActivity
             }
         }
 
+        public void ReloadRegime()
+        {
+            // if (GeneralData.RegimeUpdateVersion == regimeUpdateVersion)
+            //     return;
+            regimeUpdateVersion = GeneralData.RegimeUpdateVersion;
+            today.ChangeRegime(GeneralData.Regimes[RegimeDropDown.Index]);
+            SaveToday();
+            UpdateList();
+        }
+        
         public void ChangeRegime(int newInd)
         {
+            regimeUpdateVersion = GeneralData.RegimeUpdateVersion;
             today.ChangeRegime(GeneralData.Regimes[newInd]);
             SaveToday();
             UpdateList();

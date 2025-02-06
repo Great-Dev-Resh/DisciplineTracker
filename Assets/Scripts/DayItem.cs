@@ -122,7 +122,7 @@ public class DayItem : MonoBehaviour
 
     private void UpdateBattery(Day dayData)
     {
-        float ratio = dayData.GetSportRatio();
+        float ratio = dayData.GetRawRatio();
 
         Color col = GetColor(ratio);
 

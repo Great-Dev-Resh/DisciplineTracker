@@ -9,18 +9,7 @@ namespace GreatDevResh.Data
         public string Title;
         public int weight;
 
-        public int groupIndex
-        {
-            get
-            {
-                if (_groupIndex != 0 && !GeneralData.GroupNames.ContainsKey(_groupIndex))
-                    _groupIndex = 0;
-                return _groupIndex;
-            }
-            set => _groupIndex = value;
-        }
-
-        private int _groupIndex;
+        public string group;
 
         public ConsistencyBaseClass(string str, ref int ind) { }
 
@@ -40,7 +29,7 @@ namespace GreatDevResh.Data
         
         public override string ToString()
         {
-            return "{(" + Title.Length + ":" + Title + ")," + weight + "," + groupIndex + "}";
+            return "{(" + Title.Length + ":" + Title + ")," + weight + "," + group.Length + ":" + group + "}";
         }
 
         protected virtual void BuildFromStr(string str, ref int ind)
@@ -51,7 +40,9 @@ namespace GreatDevResh.Data
             ind += 2;
 
             weight = StringHelper.GetNumber(str, ref ind, ',');
-            groupIndex = StringHelper.GetNumber(str, ref ind, '}');
+            int groupLen = StringHelper.GetNumber(str, ref ind, ':');
+            group = StringHelper.GetString(str, ref ind, groupLen);
+            ++ind;
         }
 
         public static ConsistencyBaseClass UnpackHash(string str, ref int ind)
@@ -83,7 +74,7 @@ namespace GreatDevResh.Data
         {
             Title = other.Title;
             weight = other.weight;
-            groupIndex = other.groupIndex;
+            group = other.group;
         }
 
         public virtual bool HaveSomeProgress() => false;

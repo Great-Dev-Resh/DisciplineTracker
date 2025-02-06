@@ -10,12 +10,11 @@ namespace GreatDevResh.Data.Classes
     public static class GeneralData
     {
         public static MyDate startDate;
-        [FormerlySerializedAs("day")] public static int startDay;
+        public static int startDay;
 
         public static List<RegimeClass> Regimes;
-        public static Dictionary<int, string> GroupNames;
+        public static List<string> GroupNames;
         public static int DefaultRegime;
-        public static int MaxGroupIndex;
 
         public static int GroupUpdateVersion = 0;
         public static int RegimeUpdateVersion = 0;
@@ -28,10 +27,9 @@ namespace GreatDevResh.Data.Classes
         public static void CreateNew()
         {
             Regimes = new List<RegimeClass>();
-            GroupNames = new Dictionary<int, string>();
-            MaxGroupIndex = 0;
+            GroupNames = new List<string>();
 
-            Regimes.Add(new RegimeClass("Normal"));
+            Regimes.Add(new RegimeClass("Default regime"));
             DefaultRegime = 0;
 
             IsCreated = true;
@@ -47,19 +45,16 @@ namespace GreatDevResh.Data.Classes
 
             Regimes = StringHelper.GetList<RegimeClass>(str, ref ind);
             ind += 2;
-            GroupNames = new Dictionary<int, string>();
-            while (str[ind] == '(')
+            GroupNames = new List<string>();
+            while (str[ind] != '}')
             {
-                ++ind;
-                int key = StringHelper.GetNumber(str, ref ind, ',');
-                int len = StringHelper.GetNumber(str, ref ind, ',');
+                int len = StringHelper.GetNumber(str, ref ind, ':');
                 string group = StringHelper.GetString(str, ref ind, len);
-                GroupNames[key] = group;
-                ind += 2;
+                GroupNames.Add(group);
+                ind++;
             }
             ind += 2;
-            DefaultRegime = StringHelper.GetNumber(str, ref ind, ',');
-            MaxGroupIndex = StringHelper.GetNumber(str, ref ind, '}');
+            DefaultRegime = StringHelper.GetNumber(str, ref ind, '}');
 
             IsCreated = true;
         }
@@ -69,13 +64,13 @@ namespace GreatDevResh.Data.Classes
             string res = "{" + startDay + "," + startDate.Month + "," + startDate.Year + "\n";
             res += StringHelper.PackList(ref Regimes);
             res += "\n{";
-            foreach (var pair in GroupNames)
+            foreach (var group in GroupNames)
             {
-                res += "(" + pair.Key + "," + pair.Value.Length + "," + pair.Value + "),";
+                res += group.Length + ":" + group + ",";
             }
 
             res += "}\n";
-            res += DefaultRegime + "," + MaxGroupIndex + "}";
+            res += DefaultRegime + "}";
             
             return res;
         }

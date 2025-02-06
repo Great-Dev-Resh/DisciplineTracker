@@ -1,4 +1,5 @@
-﻿using GreatDevResh.Data.Classes;
+﻿using System.Linq;
+using GreatDevResh.Data.Classes;
 using GreatDevResh.Data.Regimes;
 using TMPro;
 using UnityEngine;
@@ -15,11 +16,12 @@ namespace GreatDevResh.AppliedStuff.RegimeSettings
         public void StartCreation()
         {
             titleInputField.text = "";
+            BtnCreate.SetActive(false);
         }
 
         public void Create()
         {
-            GeneralData.Regimes.Add(new RegimeClass(titleInputField.text));
+            GeneralData.Regimes.Add(new RegimeClass(ProcessedString()));
             ++GeneralData.RegimeUpdateVersion;
             GeneralData.Save();
             
@@ -28,7 +30,26 @@ namespace GreatDevResh.AppliedStuff.RegimeSettings
 
         public void OnValueChanged()
         {
-            BtnCreate.SetActive(titleInputField.text != "");
+            string newName = ProcessedString().ToLower();
+            bool notContains = GeneralData.Regimes.Aggregate(true, (current, regime) => current && regime.Name.ToLower() != newName);
+            BtnCreate.SetActive(newName != "" && notContains);
+        }
+
+        private string ProcessedString()
+        {
+            string result = "";
+            int cntBegin = 0;
+            int cntEnd = 0;
+            int len = titleInputField.text.Length;
+
+            while (cntBegin < len && titleInputField.text[cntBegin] == ' ')
+                cntBegin++;
+            while (cntEnd < len && titleInputField.text[len - 1 - cntEnd] == ' ')
+                cntEnd++;
+
+            for (int i = cntBegin; i < len - cntEnd; ++i)
+                result += titleInputField.text[i];
+            return result;
         }
     }
 }

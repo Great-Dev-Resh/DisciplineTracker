@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using GreatDevResh.AppliedStuff;
 using GreatDevResh.Data.Regimes;
 using GreatDevResh.MultiUseful;
 using UnityEngine;
@@ -60,24 +61,28 @@ namespace GreatDevResh.Data.Classes
             a1.SetSection(new GoalSection(lastDay.firstGoal, -1, 0, 0));
             a1.SetValue(lastDay.first);
             a1.Title = "Бег";
+            a1.group = GroupDropDown.Without_Group;
             activities.Add(a1);
             
             AmountClass a2 = new AmountClass();
             a2.SetSection(new GoalSection(lastDay.secondGoal, -1, 0, 0));
             a2.SetValue(lastDay.second);
             a2.Title = "Подтягивания";
+            a2.group = GroupDropDown.Without_Group;
             activities.Add(a2);
             
             AmountClass a3 = new AmountClass();
             a3.SetSection(new GoalSection(lastDay.thirdGoal, -1, 0, 0));
             a3.SetValue(lastDay.third);
             a3.Title = "Отжимания";
+            a3.group = GroupDropDown.Without_Group;
             activities.Add(a3);
             
             AmountClass a4 = new AmountClass();
             a4.SetSection(new GoalSection(lastDay.fourthGoal, -1, 0, 0));
             a4.SetValue(lastDay.fourth);
             a4.Title = "Приседания";
+            a4.group = GroupDropDown.Without_Group;
             activities.Add(a4);
         }
 
@@ -138,7 +143,7 @@ namespace GreatDevResh.Data.Classes
             return res;
         }
 
-        public float GetSportRatio()
+        public float GetRawRatio()
         {
             float ratio = 0;
             float cnt = 0;
@@ -166,10 +171,45 @@ namespace GreatDevResh.Data.Classes
                 return -1;
             return ratio / cnt;
         }
-
-        public int GetNumberOfRatio()
+        
+        public float GetRawRatio(in bool sortingDefault, in List<string> elseGroups)
         {
-            float ratio = GetSportRatio();
+            float ratio = 0;
+            float cnt = 0;
+
+            for (int i = 0; i < activities.Count; ++i)
+            {
+                if (!(sortingDefault ^ elseGroups.Contains(activities[i].group)))
+                    continue;
+                if (activities[i].CanBeCompleted())
+                {
+                    cnt += activities[i].weight;
+                    ratio += activities[i].GetCompleteness() * activities[i].weight;
+                }
+            }
+
+            if (bonusForSport > 0)
+            {
+                for (int i = 0; i < bonusForSport; ++i)
+                    ratio *= 1.3f;
+            } else if (bonusForSport < 0)
+            {
+                for (int i = 0; i > bonusForSport; --i)
+                    ratio /= 1.2f;
+            }
+
+            if (cnt == 0)
+                return -1;
+            return ratio / cnt;
+        }
+
+        public int GetNumberOfRatio() => GetNumberOfRatio(GetRawRatio());
+        
+        public int GetNumberOfRatio(in bool sortingDefault, in List<string> elseGroups) 
+            => GetNumberOfRatio(GetRawRatio(in sortingDefault, in elseGroups));
+
+        public static int GetNumberOfRatio(float ratio)
+        {
             if (ratio < 0)
                 return -1;
 

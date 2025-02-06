@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using GreatDevResh.Data;
 using GreatDevResh.Data.Classes;
 using GreatDevResh.Data.Regimes;
@@ -88,7 +89,7 @@ namespace GreatDevResh.AppliedStuff
                 AmountClass obj = new AmountClass
                 {
                     Title = title,
-                    groupIndex = GroupDropDown.Index,
+                    group = GroupDropDown.Group,
                     weight = int.Parse(Weight_IF.text),
                     defaultValue = Am_defaultValue
                 };
@@ -101,7 +102,7 @@ namespace GreatDevResh.AppliedStuff
                 CheckBoxClass obj = new CheckBoxClass
                 {
                     Title = title,
-                    groupIndex = GroupDropDown.Index,
+                    group = GroupDropDown.Group,
                     weight = int.Parse(Weight_IF.text),
                     DefaultValue = Ch_defaultValue
                 };
@@ -118,7 +119,7 @@ namespace GreatDevResh.AppliedStuff
                 ScheduleClass obj = new ScheduleClass
                 {
                     Title = title,
-                    groupIndex = GroupDropDown.Index,
+                    group = GroupDropDown.Group,
                     weight = int.Parse(Weight_IF.text),
                     defaultValue =  Sc_defaultValue.time,
                     section = section
@@ -129,18 +130,6 @@ namespace GreatDevResh.AppliedStuff
             }
             
             GoalShower.UpdateList();
-        }
-
-        public void AmSetActiveLowerBoundary(bool isActive)
-        {
-            Am_lowerBoundaryActive = isActive;
-            AmUpdateSegmentImage();
-        }
-        
-        public void AmSetActiveUpperBoundary(bool isActive)
-        {
-            Am_upperBoundaryActive = isActive;
-            AmUpdateSegmentImage();
         }
 
         private void AmUpdateSegmentImage()
@@ -177,7 +166,7 @@ namespace GreatDevResh.AppliedStuff
             // Am_lowerRange = Am_upperRange = 0;
             title = "";
             Title_IF.text = "";
-            GroupDropDown.SetSelectedItem(0);
+            GroupDropDown.SetSelectedItem(GroupDropDown.Without_Group);
             Weight_IF.text = "1";
             
             Am_lowerBoundary_IF.text = "10";
@@ -198,10 +187,17 @@ namespace GreatDevResh.AppliedStuff
             Sc_defaultValue.Init();
         }
 
-        public void TryToGetNext()
+        public void TryToGetNextPage()
         {
-            if (whatWeCreating is < 0 or > 2)
+            if (whatWeCreating is < 0 or > 2 || title == "")
                 return;
+            
+            string newTitle = title.ToLower();
+            bool contains = currentRegime.activities.Aggregate(false, 
+                (current, activity) => current || activity.Title.ToLower() == newTitle);
+            if (contains)
+                return;
+            
             PageTypeAndName.SetActive(false);
             switch (whatWeCreating)
             {
@@ -219,11 +215,50 @@ namespace GreatDevResh.AppliedStuff
 
         public void SetRegimeIndex(int value) => regimeCurrentIndex = value;
 
+        public void SetName(string value)
+        {
+            title = ProcessedString(value);
+
+            if (title != "") {
+                ImageOfBtnNext.color = ColorOfBtnActive;
+            } else {
+                ImageOfBtnNext.color = ColorOfBtnNotActive;
+            }
+        }
+        
+        private string ProcessedString(string str)
+        {
+            string result = "";
+            int cntBegin = 0;
+            int cntEnd = 0;
+            int len = str.Length;
+
+            while (cntBegin < len && str[cntBegin] == ' ')
+                cntBegin++;
+            while (cntEnd < len && str[len - 1 - cntEnd] == ' ')
+                cntEnd++;
+
+            for (int i = cntBegin; i < len - cntEnd; ++i)
+                result += str[i];
+            return result;
+        }
+
         #region InputFields
 
+        public void AmSetActiveUpperBoundary(bool isActive)
+        {
+            Am_upperBoundaryActive = isActive;
+            AmUpdateSegmentImage();
+        }
+
+        public void AmSetActiveLowerBoundary(bool isActive)
+        {
+            Am_lowerBoundaryActive = isActive;
+            AmUpdateSegmentImage();
+        }
+
         public void SetChDefaultValue(bool value) => Ch_defaultValue = value;
-        
-        public void SetName(string value) => title = value;
+
 
         public void SetAmDefaultValue(string value)
         {

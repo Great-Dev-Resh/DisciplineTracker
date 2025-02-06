@@ -717,14 +717,6 @@ MonoBehaviour:
       m_Image: {fileID: 0}
     - m_Text: "\u0421\u043F\u043E\u0440\u0442"
       m_Image: {fileID: 0}
-    - m_Text: "\u042B\u042B\u042B\u042B\u042B\u042B\u042B\u042B\u042B\u042B\u042B\u042B\u042B\u042B\u042B\u042B\u042B\u042B\u042B\u042B\u042B\u042B\u042B\u042B\u042B\u042B\u042B\u042B"
-      m_Image: {fileID: 0}
-    - m_Text: Sport
-      m_Image: {fileID: 0}
-    - m_Text: -||-
-      m_Image: {fileID: 0}
-    - m_Text: 0123456789012345678901234567890123456789
-      m_Image: {fileID: 0}
   m_OnValueChanged:
     m_PersistentCalls:
       m_Calls:
@@ -753,6 +745,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7875b7b436e442e1aa39ef0ce421f9da, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  OnValueChangedAction:
+    m_PersistentCalls:
+      m_Calls: []
   Dropdown: {fileID: 4748130710939479178}
 --- !u!1 &5789417814362033577
 GameObject:

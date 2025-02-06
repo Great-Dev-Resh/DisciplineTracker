@@ -14,8 +14,9 @@ namespace GreatDevResh.AppliedStuff
         [SerializeField] private TMP_Dropdown Dropdown;
         
         private int localUpdateVersion = -1;
+        private string currentRegime = "";
 
-        private int Index = 0;
+        public int Index { get; private set; } = 0;
         
         public void OnValueChanged(int value)
         {
@@ -24,7 +25,7 @@ namespace GreatDevResh.AppliedStuff
             OnValueChangedAction?.Invoke(Index);
         }
         
-        public void UpdateList()
+        public void UpdateList(bool broadCastIfReset = false)
         {
             if (localUpdateVersion == GeneralData.RegimeUpdateVersion)
                 return;
@@ -34,6 +35,14 @@ namespace GreatDevResh.AppliedStuff
             foreach (var regime in GeneralData.Regimes)
             {
                 Dropdown.options.Add(new TMP_Dropdown.OptionData(regime.Name));
+            }
+
+            if (Index >= Dropdown.options.Count || Dropdown.options[Index].text != currentRegime)
+            {
+                Dropdown.SetValueWithoutNotify(GeneralData.DefaultRegime);
+                Index = GeneralData.DefaultRegime;
+                if (broadCastIfReset)
+                    OnValueChangedAction?.Invoke(Index);
             }
             
             Dropdown.RefreshShownValue();
@@ -69,7 +78,7 @@ namespace GreatDevResh.AppliedStuff
         private void OnEnable()
         {
             if (startHappened)
-                UpdateList();
+                UpdateList(true);
         }
     }
 }

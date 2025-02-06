@@ -32,10 +32,10 @@ namespace GreatDevResh.AppliedStuff.GroupSettings
 
         public void Delete()
         {
-            GeneralData.GroupNames.Remove(index);
+            GeneralData.GroupNames.RemoveAt(index);
             GeneralData.GroupUpdateVersion++;
             GeneralData.Save();
-            gameObject.SetActive(false);
+            GroupShower.UpdateList();
         }
     }
 }

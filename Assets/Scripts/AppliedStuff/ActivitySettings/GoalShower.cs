@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using GreatDevResh.Data;
 using GreatDevResh.Data.Classes;
@@ -25,13 +26,18 @@ namespace GreatDevResh.AppliedStuff
 
         private RegimeClass regime;
 
-        private void Start()
+        private void Awake()
         {
+            Info.Init();
+            
             amountObjects = new List<GoalAmountItem>();
             scheduleObjects = new List<GoalScheduleItem>();
             checkBoxObjects = new List<GoalCheckBoxItem>();
             activeObjects = new List<RectTransform>();
+        }
 
+        private void Start()
+        {
             UpdateList();
         }
 

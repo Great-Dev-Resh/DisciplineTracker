@@ -17,41 +17,52 @@ public static class Info
     
     private static bool _isInit = false;
 
-    public static void SaveToday()
-    {
-        MonthData currentMonth = Store[now.Int()];
-        if (currentMonth is null)
-            return;
+    public static Day TodayDayData =>
+        Store[now.Int()] is not null && Store[now.Int()].days[DateController.Day] is not null
+            ? Store[now.Int()].days[DateController.Day]
+            : null;
 
-        string json = currentMonth.To_string();
-        FileDataHandler.Save(now.To_String(), json);
+    public static void SaveToday() => SaveDay(now);
+
+    public static void SaveDay(MyDate date)
+    {
+        if (!Store.ContainsKey(date.Int()) || Store[date.Int()] is null)
+            return;
+        
+        string str = Store[date.Int()].To_string();
+        FileDataHandler.Save(date.To_String(), str);
+    }
+
+    public static bool LoadMonth(MyDate _date)
+    {
+        MyDate date = new MyDate(ref _date);
+        if (date < GeneralData.startDate)
+            return false;
+        
+        Debug.Log("Reading: " + date.Int());
+        string str = FileDataHandler.Load(date.To_String());
+        if (str is null or "")
+            return false;
+        
+        Store[date.Int()] = new MonthData(str);
+        Debug.Log("Creating: " + date.Int());
+        return true;
     }
 
     public static MyDate LoadLastMonth(MyDate _date)
     {
         var date = new MyDate(ref _date);
-        if (date.Year < GeneralData.startDate.Year || 
-            date.Year == GeneralData.startDate.Year && date.Month < GeneralData.startDate.Month)
+        if (date < GeneralData.startDate)
             return null;
 
-        string json = FileDataHandler.Load(date.To_String());
-        while ((date.Year > GeneralData.startDate.Year ||
-                date.Year == GeneralData.startDate.Year && date.Month > GeneralData.startDate.Month) &&
-               json is null or "")
+        bool result = LoadMonth(date);
+        while (!result && date > GeneralData.startDate)
         {
             --date.Month;
-            json = FileDataHandler.Load(date.To_String());
+            result = LoadMonth(date);
         }
 
-        if (json is null or "")
-            return null;
-
-        if (Store.ContainsKey(date.Int()))
-            return date;
-
-        Store.Add(date.Int(), new MonthData(json));
-        // print(date.Month + " " + date.Year);
-        return date;
+        return !result ? null : date;
     }
 
     public static void Init()
@@ -66,35 +77,7 @@ public static class Info
         now = new MyDate(DateController.Year, DateController.Month);
         GetGeneralData();
 
-        MyDate lastDate = LoadLastMonth(now);
-        Day lastDay = null;
-        bool skip = false;
-        if (Store.ContainsKey(now.Int()))
-        {
-            now.Month--;
-            LoadLastMonth(now);
-            now.Month++;
-
-            int dayBefore = DateController.Day;
-            while (lastDay is null && dayBefore > 1 && (GeneralData.startDate.Int() != now.Int() || GeneralData.startDay != dayBefore))
-                lastDay = Store[now.Int()].days[--dayBefore];
-            skip = dayBefore < DateController.Day - 1;
-        }
-        else if (lastDate is not null)
-        {
-            skip = DateController.Day != 1; //Store[lastDate.Int()].days[lastDate.AmountOfDays()] is null;
-            for (int i = Store[lastDate.Int()].days.Count - 1; i > 0; --i)
-            {
-                if (Store[lastDate.Int()].days[i] is null) continue;
-                lastDay = Store[lastDate.Int()].days[i];
-                break;
-            }
-        }
-        
-        if (!Store.ContainsKey(now.Int()))
-        {
-            Store[now.Int()] = new MonthData(32);
-        }
+        CheckForDate(now);
 
         if (Store[now.Int()].days[DateController.Day] is null)
         {
@@ -121,18 +104,15 @@ public static class Info
         }
     }
 
-    public static void CreateMonthData(MyDate data)
+    public static void CheckForDate(MyDate date)
     {
-        if (!Store.ContainsKey(data.Int()))
-            Store[data.Int()] = new MonthData();
-        for (int i = 1; i <= 31; ++i)
-        {
-            if (Store[data.Int()].days[i] is null)
-                Store[data.Int()].days[i] = new Day();
-        }
-        
-        string json = Store[data.Int()].To_string();
-        FileDataHandler.Save(data.To_String(), json);
+        if (GeneralData.startDate > date || (Store.ContainsKey(date.Int()) && Store[date.Int()] is not null))
+            return;
+        LoadMonth(date);
+        if (Store.ContainsKey(date.Int()) && Store[date.Int()] is not null)
+            return;
+        Store[date.Int()] = new MonthData();
+        SaveDay(date);
     }
 
     public static Colors GetLastMonthColors()

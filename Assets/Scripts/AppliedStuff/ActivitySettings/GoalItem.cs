@@ -43,7 +43,7 @@ namespace GreatDevResh.AppliedStuff
             GoalShower.DeleteElement(elementIndex);
         }
         
-        public virtual void ChangeGroup(int newInd) {}
+        public virtual void ChangeGroup(string newGroup) {}
 
         private bool startHappened = false;
 

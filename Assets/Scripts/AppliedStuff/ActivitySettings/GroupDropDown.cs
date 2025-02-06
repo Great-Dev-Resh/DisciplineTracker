@@ -10,87 +10,87 @@ namespace GreatDevResh.AppliedStuff
 {
     public class GroupDropDown : MonoBehaviour
     {
-        public UnityEvent<int> OnValueChangedAction;
+        public UnityEvent<string> OnValueChangedAction;
         
         [SerializeField] private TMP_Dropdown Dropdown;
         
-        private static Dictionary<int, string> dict;
-        private static int GroupUpdateVersion = -1;
-        
-        private List<int> decipheringForIndexes;
         private int localUpdateVersion = -1;
 
         private int currentIndexInDropDown = 0;
 
-        public int Index
-        {
-            get
-            {
-                if (decipheringForIndexes is null)
-                    UpdateList();
-                if (currentIndexInDropDown < 0 || currentIndexInDropDown >= decipheringForIndexes.Count)
-                {
-                    currentIndexInDropDown = 0;
-                    UpdateList();
-                }
+        public const string Without_Group = "Without group";
 
-                return decipheringForIndexes[currentIndexInDropDown];
-            }
-        }
+        public string Group { get; private set; } = Without_Group;
 
         public void OnValueChanged(int value)
         {
             if (currentIndexInDropDown == value) return;
+
+            int previousValue = currentIndexInDropDown;
             currentIndexInDropDown = value;
-            OnValueChangedAction?.Invoke(Index);
+            Group = Dropdown.options[value].text;
+            OnValueChangedAction?.Invoke(Dropdown.options[currentIndexInDropDown].text);
+            
+            if (previousValue == Dropdown.options.Count - 1)
+            {
+                localUpdateVersion--;
+                Debug.Log("Update on value changed");
+                UpdateList();
+            }
         }
 
         public void UpdateList()
         {
-            if (GroupUpdateVersion != GeneralData.GroupUpdateVersion)
-            {
-                dict = GeneralData.GroupNames.OrderBy(x => x.Key).ToDictionary(x => x.Key, x => x.Value);
-                GroupUpdateVersion = GeneralData.GroupUpdateVersion;
-            }
-
-            if (localUpdateVersion == GroupUpdateVersion)
+            if (localUpdateVersion == GeneralData.GroupUpdateVersion)
                 return;
-            localUpdateVersion = GroupUpdateVersion;
+            localUpdateVersion = GeneralData.GroupUpdateVersion;
 
-            int selectedItem =  decipheringForIndexes is not null && currentIndexInDropDown != 0 ? Index : 0;
-
+            bool wasCurrentGroup = false;
             Dropdown.options = new List<TMP_Dropdown.OptionData>();
-            decipheringForIndexes = new List<int>();
-
-            Dropdown.options.Add(new TMP_Dropdown.OptionData("Without group"));
-            decipheringForIndexes.Add(0);
-
-            foreach (var pair in dict)
+            Dropdown.options.Add(new TMP_Dropdown.OptionData(Without_Group));
+            if (Without_Group == Group)
             {
-                Dropdown.options.Add(new TMP_Dropdown.OptionData(pair.Value));
-                decipheringForIndexes.Add(pair.Key);
+                wasCurrentGroup = true;
+                Dropdown.SetValueWithoutNotify(Dropdown.options.Count - 1);
+                currentIndexInDropDown = Dropdown.options.Count - 1;
             }
 
-            SetSelectedItem(selectedItem);
+            foreach (var groupElement in GeneralData.GroupNames)
+            {
+                Dropdown.options.Add(new TMP_Dropdown.OptionData(groupElement));
+                if (groupElement == Group)
+                {
+                    wasCurrentGroup = true;
+                    Dropdown.SetValueWithoutNotify(Dropdown.options.Count - 1);
+                    currentIndexInDropDown = Dropdown.options.Count - 1;
+                }
+            }
+
+            if (!wasCurrentGroup)
+            {
+                Dropdown.options.Add(new TMP_Dropdown.OptionData(Group));
+                Dropdown.SetValueWithoutNotify(Dropdown.options.Count - 1);
+                currentIndexInDropDown = Dropdown.options.Count - 1;
+            }
             
             Dropdown.RefreshShownValue();
         }
 
-        public void SetSelectedItem(int ind)
+        public void SetSelectedItem(string _group)
         {
-            if (Index == ind)
+            if (Group == _group)
                 return;
-            
-            int l = 0, r = decipheringForIndexes.Count;
-            while (r - l > 1)
+
+            Group = _group;
+            int ind = 0;
+            while (ind < Dropdown.options.Count && Dropdown.options[ind].text != _group) ++ind;
+            if (ind >= Dropdown.options.Count)
             {
-                int m = (l + r) / 2;
-                if (decipheringForIndexes[m] <= ind) l = m;
-                else r = m;
+                UpdateList();
+            } else {
+                Dropdown.SetValueWithoutNotify(ind);
+                currentIndexInDropDown = ind;
             }
-            
-            Dropdown.SetValueWithoutNotify(l);
-            currentIndexInDropDown = decipheringForIndexes[l];
         }
         
         private bool startHappened = false;
