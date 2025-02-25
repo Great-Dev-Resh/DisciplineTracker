@@ -39,13 +39,13 @@ public static class Info
         if (date < GeneralData.startDate)
             return false;
         
-        Debug.Log("Reading: " + date.Int());
+        //Debug.Log("Reading: " + date.Int());
         string str = FileDataHandler.Load(date.To_String());
         if (str is null or "")
             return false;
         
         Store[date.Int()] = new MonthData(str);
-        Debug.Log("Creating: " + date.Int());
+        //Debug.Log("Creating: " + date.Int());
         return true;
     }
 
@@ -79,10 +79,13 @@ public static class Info
 
         CheckForDate(now);
 
+        StatisticsData.LoadData();
         if (Store[now.Int()].days[DateController.Day] is null)
         {
             Store[now.Int()].days[DateController.Day] = new Day(GeneralData.Regimes[GeneralData.DefaultRegime]);
             SaveToday();
+            StatisticsData.AddDay(now, DateController.Day);
+            StatisticsData.SaveData();
         }
     }
 
@@ -110,7 +113,15 @@ public static class Info
             return;
         LoadMonth(date);
         if (Store.ContainsKey(date.Int()) && Store[date.Int()] is not null)
+        {
+            if (date == now)
+            {
+                for (int i = DateController.Day + 1; i <= now.AmountOfDays(); ++i)
+                    Store[now.Int()].days[i] = null;
+            }
             return;
+        }
+
         Store[date.Int()] = new MonthData();
         SaveDay(date);
     }
@@ -265,6 +276,32 @@ public class MyDate
         if (Year % 400 == 0 || Year % 100 != 0 && Year % 4 == 0)
             return 29;
         return 28;
+    }
+
+    public static int DaysSince2025()
+    {
+        int year = DateController.Year;
+        int res = DateController.Day;
+        while (year > 2025)
+        {
+            year--;
+            res += (year % 400 == 0 || year % 100 != 0 && year % 4 == 0 ? 366 : 365);
+        }
+
+        int month = DateController.Month;
+        year = DateController.Year;
+        while (month > 1)
+        {
+            month--;
+            if (month == 1 || month == 3 || month == 5 || month == 7 || month == 8 || month == 10 || month == 12)
+                res += 31;
+            if (month == 4 || month == 6 || month == 9 || month == 11)
+                res += 30;
+            if (year % 400 == 0 || year % 100 != 0 && year % 4 == 0)
+                res += 29;
+        }
+
+        return res;
     }
 }
 

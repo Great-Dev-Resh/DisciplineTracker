@@ -28,13 +28,13 @@ namespace GreatDevResh.Data
 
         public float GetRatio(TimeClass value)
         {
-            if (value <= upperBoundary && value >= lowerBoundary ||
+            if (lowerBoundary <= value && value <= upperBoundary ||
                 lowerBoundary > upperBoundary && (value >= lowerBoundary || value <= upperBoundary))
                 return 1;
             if (lowerRange.minutes == 0 || upperRange.minutes == 0)
                 return 0;
-            return 1 - Mathf.Min((lowerBoundary - value).minutes / lowerRange.minutes,
-                    (value - upperBoundary).minutes / upperRange.minutes, 1);
+            return 1 - Mathf.Min((float)(lowerBoundary - value).minutes / lowerRange.minutes,
+                    (float)(value - upperBoundary).minutes / upperRange.minutes, 1);
         }
         
         public string GetHash()

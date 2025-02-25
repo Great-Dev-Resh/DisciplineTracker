@@ -30,6 +30,7 @@ namespace GreatDevResh.Data.Classes
             GroupNames = new List<string>();
 
             Regimes.Add(new RegimeClass("Default regime"));
+            GroupNames.Add("Sport");
             DefaultRegime = 0;
 
             IsCreated = true;

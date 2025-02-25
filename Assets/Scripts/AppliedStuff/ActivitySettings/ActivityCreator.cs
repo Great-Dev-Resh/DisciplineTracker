@@ -32,6 +32,11 @@ namespace GreatDevResh.AppliedStuff
         [SerializeField] private GameObject PageScheduleClass;
         [SerializeField] private GameObject PageCheckBoxClass;
 
+        [SerializeField] private Image[] TypeBtnImages;
+        [SerializeField] private Color ActiveTypeBtnColor;
+        [SerializeField] private Color InactiveTypeBtnColor;
+        [SerializeField] private TMP_Text CreationMessage;
+
         [FormerlySerializedAs("Am_lowerBoundary")]
         [Header("Amount class")] 
         [SerializeField] private TMP_InputField Am_lowerBoundary_IF;
@@ -67,6 +72,10 @@ namespace GreatDevResh.AppliedStuff
         {
             whatWeCreating = index; // 0 - amount, 1 - schedule, 2 - checkBox
             ImageOfBtnNext.color = ColorOfBtnActive;
+
+            foreach (var imageBtn in TypeBtnImages)
+                imageBtn.color = InactiveTypeBtnColor;
+            TypeBtnImages[index].color = ActiveTypeBtnColor;
         }
 
         public void Create()
@@ -114,7 +123,8 @@ namespace GreatDevResh.AppliedStuff
                 TimeSection section = new TimeSection
                 {
                     lowerBoundary = Sc_lowerBoundary.time, upperBoundary = Sc_upperBoundary.time, 
-                    lowerRange = Sc_lowerRange.time, upperRange = Sc_upperRange.time
+                    lowerRange = (Sc_lowerBoundary.time - Sc_lowerRange.time), 
+                    upperRange = (Sc_upperRange.time - Sc_upperBoundary.time)
                 };
                 ScheduleClass obj = new ScheduleClass
                 {
@@ -185,6 +195,9 @@ namespace GreatDevResh.AppliedStuff
             Sc_lowerRange.Init();
             Sc_upperRange.Init();
             Sc_defaultValue.Init();
+            
+            foreach (var imageBtn in TypeBtnImages)
+                imageBtn.color = InactiveTypeBtnColor;
         }
 
         public void TryToGetNextPage()

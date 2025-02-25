@@ -32,6 +32,8 @@ namespace GreatDevResh.Data
             return "{(" + Title.Length + ":" + Title + ")," + weight + "," + group.Length + ":" + group + "}";
         }
 
+        public virtual bool AmountLowerBoundaryOnly() => false;
+
         protected virtual void BuildFromStr(string str, ref int ind)
         {
             ind += 2;

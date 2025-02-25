@@ -27,7 +27,7 @@ namespace GreatDevResh.Data
 
         public override string GetStringOfCompleteness()
         {
-            return section.lowerBoundary + " < " + value + " > " + section.upperBoundary;
+            return section.lowerBoundary + " < " + value + " < " + section.upperBoundary;
         }
 
         public override int IsHaveProgress(ConsistencyBaseClass previous)

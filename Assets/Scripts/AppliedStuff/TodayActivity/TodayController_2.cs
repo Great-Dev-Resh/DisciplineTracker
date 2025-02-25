@@ -116,7 +116,7 @@ namespace GreatDevResh.AppliedStuff.TodayActivity
         private void SetCurrentRegime()
         {
             int ind = GeneralData.DefaultRegime;
-            Debug.Log("in set regime we can see:" + today.NameOfRegime);
+            //Debug.Log("in set regime we can see:" + today.NameOfRegime);
             for (int i = 0; i < GeneralData.Regimes.Count; ++i)
             {
                 if (today.NameOfRegime != GeneralData.Regimes[i].Name) continue;
@@ -124,7 +124,7 @@ namespace GreatDevResh.AppliedStuff.TodayActivity
                 break;
             }
             
-            Debug.Log("Selected: " + ind);
+            //Debug.Log("Selected: " + ind);
             RegimeDropDown.SetSelectedItem(ind);
         }
 

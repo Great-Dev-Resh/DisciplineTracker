@@ -13,6 +13,8 @@ namespace GreatDevResh.AppliedStuff.TodayActivity
         [SerializeField] private TimeInputField InputField;
         [SerializeField] private TMP_Text LowerBoundaryText;
         [SerializeField] private TMP_Text UpperBoundaryText;
+        [SerializeField] private TMP_Text GroupText;
+        [SerializeField] private TMP_Text WeightText;
 
         public void Init(ScheduleClass _scheduleClass, TodayController_2 _todayController)
         {
@@ -26,6 +28,9 @@ namespace GreatDevResh.AppliedStuff.TodayActivity
         {
             TitleText.text = scheduleClass.Title;
             InputField.Set(scheduleClass.value);
+            GroupText.text = scheduleClass.group;
+            WeightText.text = "Weight: " + scheduleClass.weight;
+            
             LowerBoundaryText.text = scheduleClass.section.lowerBoundary.ResultHours + ":" +
                                      scheduleClass.section.lowerBoundary.ResultMinutes + " /";
             UpperBoundaryText.text = "/ " + scheduleClass.section.upperBoundary.ResultHours + ":" +

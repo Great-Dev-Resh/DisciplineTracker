@@ -34,8 +34,8 @@ namespace GreatDevResh.AppliedStuff
 
             lowerBoundary.Set(scheduleClass.section.lowerBoundary);
             upperBoundary.Set(scheduleClass.section.upperBoundary);
-            lowerRange.Set(scheduleClass.section.lowerRange);
-            upperRange.Set(scheduleClass.section.upperRange);
+            lowerRange.Set(scheduleClass.section.lowerBoundary - scheduleClass.section.lowerRange);
+            upperRange.Set(scheduleClass.section.upperBoundary + scheduleClass.section.upperRange);
             defaultValue.Set(scheduleClass.defaultValue);
             
             Weight_IF.SetNumber(scheduleClass.weight);
@@ -56,8 +56,8 @@ namespace GreatDevResh.AppliedStuff
             
             if (lowerBoundary.time == scheduleClass.section.lowerBoundary &&
                 upperBoundary.time == scheduleClass.section.upperBoundary &&
-                lowerRange.time == scheduleClass.section.lowerRange &&
-                upperRange.time == scheduleClass.section.upperRange &&
+                lowerBoundary.time - lowerRange.time == scheduleClass.section.lowerRange &&
+                upperRange.time - upperBoundary.time == scheduleClass.section.upperRange &&
                 defaultValue.time == scheduleClass.defaultValue &&
                 Weight_IF.Value == scheduleClass.weight)
                 return;
@@ -66,8 +66,8 @@ namespace GreatDevResh.AppliedStuff
 
             scheduleClass.section.lowerBoundary = lowerBoundary.time;
             scheduleClass.section.upperBoundary = upperBoundary.time;
-            scheduleClass.section.lowerRange = lowerRange.time;
-            scheduleClass.section.upperRange = upperRange.time;
+            scheduleClass.section.lowerRange = lowerBoundary.time - lowerRange.time;
+            scheduleClass.section.upperRange = upperRange.time - upperBoundary.time;
             scheduleClass.defaultValue = defaultValue.time;
             scheduleClass.weight = Weight_IF.Value;
             

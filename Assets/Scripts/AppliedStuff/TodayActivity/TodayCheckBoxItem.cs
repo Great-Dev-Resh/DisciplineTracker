@@ -12,6 +12,8 @@ namespace GreatDevResh.AppliedStuff.TodayActivity
 
         [SerializeField] private TMP_Text TitleText;
         [SerializeField] private Toggle Toggle;
+        [SerializeField] private TMP_Text GroupText;
+        [SerializeField] private TMP_Text WeightText;
 
         public void Init(CheckBoxClass _checkBoxClass, TodayController_2 _todayController)
         {
@@ -25,6 +27,9 @@ namespace GreatDevResh.AppliedStuff.TodayActivity
         {
             TitleText.text = checkBoxClass.Title;
             Toggle.SetIsOnWithoutNotify(checkBoxClass.Completed);
+            
+            GroupText.text = checkBoxClass.group;
+            WeightText.text = "Weight: " + checkBoxClass.weight;
         }
 
         public void SetValue(bool value)

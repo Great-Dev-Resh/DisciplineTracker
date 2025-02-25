@@ -12,11 +12,14 @@ namespace GreatDevResh.AppliedStuff.TodayActivity
 
         [SerializeField] private TMP_Text TitleText;
         [SerializeField] private TMP_Text ValueText;
+        [SerializeField] private TMP_Text GroupText;
+        [SerializeField] private TMP_Text WeightText;
         [SerializeField] private TMP_Text[] BtnTexts; // -100 -10 -1 +1 +10 +100
         [SerializeField] private GameObject[] Btns;
         [SerializeField] private Image[] DecreaseBtns;
         [SerializeField] private Color ColorActiveBtn;
         [SerializeField] private Color ColorInactiveBtn;
+        
 
         private int[] BtnChanges;
 
@@ -34,6 +37,8 @@ namespace GreatDevResh.AppliedStuff.TodayActivity
         {
             TitleText.text = amountClass.Title;
             ValueText.text = amountClass.GetStringOfCompleteness();
+            GroupText.text = amountClass.group;
+            WeightText.text = "Weight: " + amountClass.weight;
 
             Color color = amountClass.value == 0 ? ColorInactiveBtn : ColorActiveBtn;
             foreach (var image in DecreaseBtns)

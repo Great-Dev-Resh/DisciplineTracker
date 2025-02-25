@@ -34,7 +34,6 @@ namespace GreatDevResh.AppliedStuff
             if (previousValue == Dropdown.options.Count - 1)
             {
                 localUpdateVersion--;
-                Debug.Log("Update on value changed");
                 UpdateList();
             }
         }

@@ -58,31 +58,31 @@ namespace GreatDevResh.Data.Classes
             bonusForSport = lastDay.bonus;
 
             AmountClass a1 = new AmountClass();
-            a1.SetSection(new GoalSection(lastDay.firstGoal, -1, 0, 0));
+            a1.SetSection(new GoalSection(lastDay.firstGoal == 0 ? -1 : lastDay.firstGoal, -1, lastDay.firstGoal, 0));
             a1.SetValue(lastDay.first);
             a1.Title = "Бег";
-            a1.group = GroupDropDown.Without_Group;
+            a1.group = "Sport";
             activities.Add(a1);
             
             AmountClass a2 = new AmountClass();
-            a2.SetSection(new GoalSection(lastDay.secondGoal, -1, 0, 0));
+            a2.SetSection(new GoalSection(lastDay.secondGoal == 0 ? -1 : lastDay.secondGoal, -1, lastDay.secondGoal, 0));
             a2.SetValue(lastDay.second);
             a2.Title = "Подтягивания";
-            a2.group = GroupDropDown.Without_Group;
+            a2.group = "Sport";
             activities.Add(a2);
             
             AmountClass a3 = new AmountClass();
-            a3.SetSection(new GoalSection(lastDay.thirdGoal, -1, 0, 0));
+            a3.SetSection(new GoalSection(lastDay.thirdGoal == 0 ? -1 : lastDay.thirdGoal, -1, lastDay.thirdGoal, 0));
             a3.SetValue(lastDay.third);
             a3.Title = "Отжимания";
-            a3.group = GroupDropDown.Without_Group;
+            a3.group = "Sport";
             activities.Add(a3);
             
             AmountClass a4 = new AmountClass();
-            a4.SetSection(new GoalSection(lastDay.fourthGoal, -1, 0, 0));
+            a4.SetSection(new GoalSection(lastDay.fourthGoal == 0 ? -1 : lastDay.fourthGoal, -1, lastDay.fourthGoal, 0));
             a4.SetValue(lastDay.fourth);
             a4.Title = "Приседания";
-            a4.group = GroupDropDown.Without_Group;
+            a4.group = "Sport";
             activities.Add(a4);
         }
 
@@ -153,23 +153,32 @@ namespace GreatDevResh.Data.Classes
                 if (activities[i].CanBeCompleted())
                 {
                     cnt += activities[i].weight;
-                    ratio += activities[i].GetCompleteness() * activities[i].weight;
+                    ratio += Mathf.Min(1, activities[i].GetCompleteness()) * activities[i].weight;
                 }
-            }
-
-            if (bonusForSport > 0)
-            {
-                for (int i = 0; i < bonusForSport; ++i)
-                    ratio *= 1.3f;
-            } else if (bonusForSport < 0)
-            {
-                for (int i = 0; i > bonusForSport; --i)
-                    ratio /= 1.2f;
             }
 
             if (cnt == 0)
                 return -1;
-            return ratio / cnt;
+            float res = ratio / cnt;
+            if (res > 0.998f)
+            {
+                ratio = 0;
+                cnt = 0;
+                
+                for (int i = 0; i < activities.Count; ++i)
+                {
+                    if (activities[i].CanBeCompleted() && activities[i].AmountLowerBoundaryOnly())
+                    {
+                        cnt += activities[i].weight;
+                        ratio += activities[i].GetCompleteness() * activities[i].weight;
+                    }
+                }
+
+                if (cnt == 0)
+                    return 1;
+                return Mathf.Max(1, ratio / cnt);
+            }
+            return res;
         }
         
         public float GetRawRatio(in bool sortingDefault, in List<string> elseGroups)
@@ -184,23 +193,34 @@ namespace GreatDevResh.Data.Classes
                 if (activities[i].CanBeCompleted())
                 {
                     cnt += activities[i].weight;
-                    ratio += activities[i].GetCompleteness() * activities[i].weight;
+                    ratio += Mathf.Min(1, activities[i].GetCompleteness()) * activities[i].weight;
                 }
-            }
-
-            if (bonusForSport > 0)
-            {
-                for (int i = 0; i < bonusForSport; ++i)
-                    ratio *= 1.3f;
-            } else if (bonusForSport < 0)
-            {
-                for (int i = 0; i > bonusForSport; --i)
-                    ratio /= 1.2f;
             }
 
             if (cnt == 0)
                 return -1;
-            return ratio / cnt;
+            float res = ratio / cnt;
+            if (res > 0.998f)
+            {
+                ratio = 0;
+                cnt = 0;
+                
+                for (int i = 0; i < activities.Count; ++i)
+                {
+                    if (!(sortingDefault ^ elseGroups.Contains(activities[i].group)))
+                        continue;
+                    if (activities[i].CanBeCompleted() && activities[i].AmountLowerBoundaryOnly())
+                    {
+                        cnt += activities[i].weight;
+                        ratio += activities[i].GetCompleteness() * activities[i].weight;
+                    }
+                }
+
+                if (cnt == 0)
+                    return 1;
+                return Mathf.Max(1, ratio / cnt);
+            }
+            return res;
         }
 
         public int GetNumberOfRatio() => GetNumberOfRatio(GetRawRatio());

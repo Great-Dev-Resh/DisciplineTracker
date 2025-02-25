@@ -2,6 +2,7 @@
 using System.Linq;
 using GreatDevResh.AppliedStuff.AllDays;
 using GreatDevResh.Data.Classes;
+using TMPro;
 using UnityEngine;
 
 namespace GreatDevResh.AppliedStuff.SortingPage
@@ -9,9 +10,13 @@ namespace GreatDevResh.AppliedStuff.SortingPage
     public class SortingPageManager : MonoBehaviour
     {
         [SerializeField] private TableWeekManager TableWeekManager;
+        [SerializeField] private TableThreeDays TableThreeDays;
+        [SerializeField] private HorizontalWeekManager HorizontalWeekManager;
         
         [SerializeField] private SortingGroupItem SortItemPrefab;
         [SerializeField] private Transform contentTransform;
+
+        [SerializeField] private TMP_Text BTN_SortText;
 
         private List<SortingGroupItem> items;
 
@@ -104,9 +109,10 @@ namespace GreatDevResh.AppliedStuff.SortingPage
                 isActiveOthers = value;
         }
 
+        private List<string> elseGroups;
         public void Sort()
         {
-            List<string> elseGroups = new List<string>();
+            elseGroups = new List<string>();
             for (int i = 0; i < groups.Count(); ++i)
             {
                 if (isGroupActive[i] != isActiveOthers)
@@ -115,7 +121,18 @@ namespace GreatDevResh.AppliedStuff.SortingPage
                     elseGroups.Add(groups[i]);
                 }
             }
-            TableWeekManager.SetNewSorting(isActiveOthers, elseGroups);
+            TableWeekManager.SetNewSorting(in isActiveOthers, in elseGroups);
+            TableThreeDays.SetNewSorting(in isActiveOthers, in elseGroups);
+            HorizontalWeekManager.SetNewSorting(in isActiveOthers, in elseGroups);
+
+            if (elseGroups.Count > 1)
+                BTN_SortText.text = "Mixed groups";
+            else if (elseGroups.Count == 1)
+                BTN_SortText.text = elseGroups[0];
+            else if (isActiveOthers)
+                BTN_SortText.text = "All groups";
+            else
+                BTN_SortText.text = "Nothing";
         }
     }
 }

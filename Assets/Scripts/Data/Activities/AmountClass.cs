@@ -80,6 +80,11 @@ namespace GreatDevResh.Data
             // return -1;
         }
 
+        public override bool AmountLowerBoundaryOnly()
+        {
+            return section.GetType() == GoalSectionEnum.bigger && section.lowerRange != 0;
+        }
+
         public override string ToString()
         {
             return "Am{" + base.ToString() + "," + value + "," + section.GetHash() + "," + defaultValue + "}";

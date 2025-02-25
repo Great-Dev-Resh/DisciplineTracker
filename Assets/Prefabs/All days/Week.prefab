@@ -97,6 +97,5 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   dayPrefab: {fileID: 1808254861792470988, guid: 4d394f138d3879e4097eb98e51f6bd02, type: 3}
-  emptyPrefab: {fileID: 386218262941288425, guid: 7f42c4529fcc8aa40a5443e043311060, type: 3}
-  emptyWithDotPrefab: {fileID: 386218262941288425, guid: 0b41871d59c10ea49a362cc872763c24, type: 3}
-  daysInWeek: 7
+  emptyPrefab: {fileID: 573350445926192433, guid: 7f42c4529fcc8aa40a5443e043311060, type: 3}
+  emptyWithDotPrefab: {fileID: 573350445926192433, guid: 0b41871d59c10ea49a362cc872763c24, type: 3}

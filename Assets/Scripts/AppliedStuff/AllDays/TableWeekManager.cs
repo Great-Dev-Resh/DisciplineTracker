@@ -25,9 +25,15 @@ namespace GreatDevResh.AppliedStuff.AllDays
 
         private MyDate DateOfFirstWeek;
         private int dayOfFirstWeek;
+        private MyDate DateOfLastWeek; // not include last week
+        private int dayOfLastWeek;
 
         private bool sortingDefaultValue = true;
         private List<string> sortingGroupsElse;
+
+        private const int JumpAmount = 3;
+
+        private bool WeeksWereCreated = false;
 
         private void Update()
         {
@@ -42,20 +48,28 @@ namespace GreatDevResh.AppliedStuff.AllDays
                 scrollRect.velocity = OldVelocity;
             }
 
-            float width = (items[0].rect.width + HorizontalLayoutContentGroup.spacing) * 8;
+            float width = (items[0].rect.width + HorizontalLayoutContentGroup.spacing) * JumpAmount;
             while (contentTransform.localPosition.x > 0 &&
-                (DateOfFirstWeek > GeneralData.startDate || DateOfFirstWeek == GeneralData.startDate && dayOfFirstWeek >= GeneralData.startDay))
+                (DateOfLastWeek > GeneralData.startDate || DateOfLastWeek == GeneralData.startDate && dayOfLastWeek >= GeneralData.startDay))
             {
                 Canvas.ForceUpdateCanvases();
                 isContentPositionUpdated = true;
                 contentTransform.localPosition -= new Vector3(width, 0, 0);
                 scrollRect.AddToContentPosition(new Vector2(-width, 0));
-                dayOfFirstWeek -= 7 * 8;
+                
+                dayOfFirstWeek -= 7 * JumpAmount;
                 while (dayOfFirstWeek < 1)
                 {
                     DateOfFirstWeek.Month--;
                     dayOfFirstWeek += DateOfFirstWeek.AmountOfDays();
                 }
+                dayOfLastWeek -= 7 * JumpAmount;
+                while (dayOfLastWeek < 1)
+                {
+                    DateOfLastWeek.Month--;
+                    dayOfLastWeek += DateOfLastWeek.AmountOfDays();
+                }
+                
                 RecalculateNumbers();
             }
             while (contentTransform.localPosition.x < -width && DateController.IsItWasEarlier(DateOfFirstWeek, dayOfFirstWeek))
@@ -64,12 +78,20 @@ namespace GreatDevResh.AppliedStuff.AllDays
                 isContentPositionUpdated = true;
                 contentTransform.localPosition += new Vector3(width, 0, 0);
                 scrollRect.AddToContentPosition(new Vector2(width, 0));
-                dayOfFirstWeek += 7 * 8;
+                
+                dayOfFirstWeek += 7 * JumpAmount;
                 while (dayOfFirstWeek > DateOfFirstWeek.AmountOfDays())
                 {
                     dayOfFirstWeek -= DateOfFirstWeek.AmountOfDays();
                     DateOfFirstWeek.Month++;
                 }
+                dayOfLastWeek += 7 * JumpAmount;
+                while (dayOfLastWeek > DateOfLastWeek.AmountOfDays())
+                {
+                    dayOfLastWeek -= DateOfLastWeek.AmountOfDays();
+                    DateOfLastWeek.Month++;
+                }
+                
                 RecalculateNumbers();
             }
 
@@ -87,12 +109,13 @@ namespace GreatDevResh.AppliedStuff.AllDays
             }
         }
 
-        public void SetNewSorting(bool defaultValue, List<string> notDefault)
+        public void SetNewSorting(in bool defaultValue, in List<string> notDefault)
         {
             sortingDefaultValue = defaultValue;
             sortingGroupsElse = notDefault;
             
-            RecalculateNumbers();
+            if (gameObject.activeInHierarchy)
+                RecalculateNumbers();
         }
 
         private void Start()
@@ -108,25 +131,19 @@ namespace GreatDevResh.AppliedStuff.AllDays
 
             for (int i = 0; i < itemsToAdd; ++i)
             {
-                RectTransform RT = Instantiate(items[i % items.Length], contentTransform);
+                RectTransform RT = Instantiate(weekPrefab, contentTransform);
                 RT.SetAsLastSibling();
                 weekElements.Add(RT.GetComponent<Week>());
-            }
-            
-            for (int i = 0; i < itemsToAdd; ++i)
-            {
-                int num = items.Length - i - 1;
-                while (num < 0)
-                    num += items.Length;
-                RectTransform RT = Instantiate(items[num], contentTransform);
-                RT.SetAsFirstSibling();
-                weekElements.Insert(0,RT.GetComponent<Week>());
+                weekElements[^1].SetDays(7, 2);
             }
 
+            CalculateDateOfLastWeek();
             RecalculateNumbers();
 
             contentTransform.localPosition = new Vector3(-(items[0].rect.width + HorizontalLayoutContentGroup.spacing) * (itemsToAdd + items.Length + 3),
             contentTransform.localPosition.y, contentTransform.localPosition.z);
+
+            WeeksWereCreated = true;
         }
 
         private void Awake()
@@ -145,8 +162,30 @@ namespace GreatDevResh.AppliedStuff.AllDays
                 DateOfFirstWeek.Month--;
                 dayOfFirstWeek += DateOfFirstWeek.AmountOfDays();
             }
+            if (dayOfFirstWeek > DateOfFirstWeek.AmountOfDays())
+            {
+                dayOfFirstWeek -= DateOfFirstWeek.AmountOfDays();
+                DateOfFirstWeek.Month++;
+            }
 
             // Init();
+        }
+
+        private void CalculateDateOfLastWeek()
+        {
+            dayOfLastWeek = dayOfFirstWeek - 7 * weekElements.Count;
+            DateOfLastWeek = new MyDate(ref DateOfFirstWeek);
+            while (dayOfLastWeek < 1)
+            {
+                DateOfLastWeek.Month--;
+                dayOfLastWeek += DateOfLastWeek.AmountOfDays();
+            }
+        }
+
+        private void OnEnable()
+        {
+            if (WeeksWereCreated)
+                RecalculateNumbers();
         }
     }
 }

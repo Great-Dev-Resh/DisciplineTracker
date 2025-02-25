@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using GreatDevResh.Data;
 using GreatDevResh.Data.Classes;
 using TMPro;
@@ -14,12 +15,14 @@ namespace GreatDevResh.AppliedStuff.AllDays
         [SerializeField] private TMP_Text[] Titles;
         [SerializeField] private TMP_Text[] ResultsTexts;
         [SerializeField] private Image[] ResultsImages;
+        [SerializeField] private GameObject[] Blocks;
 
         [SerializeField] private Image[] BatteryImages;
         [SerializeField] private Color[] colors;
         [SerializeField] private Color inactiveColor;
         [SerializeField] private Color doneWithoutGoal;
 
+        private int CountOfActivityBlocks = 2;
 
         public void Init(MyDate date, int day, in bool sortingDefaultValue, in List<string> sortingGroupElse)
         {
@@ -41,7 +44,8 @@ namespace GreatDevResh.AppliedStuff.AllDays
                 dayData.GetNumberOfRatio(in sortingDefaultValue, in sortingGroupElse), colors.Length - 1), 0)];
 
             int ind = 0;
-            int cnt = (int)(BatteryImages.Length * dayData.GetRawRatio(in sortingDefaultValue, in sortingGroupElse) + 0.41f);
+            float ratio = dayData.GetRawRatio(in sortingDefaultValue, in sortingGroupElse);
+            int cnt = (int)(BatteryImages.Length * ratio + (ratio is > 0.6f and < 0.9f ? 0.41f : (ratio is > 0.6f and < 0.92f ? 0.2f : 0)));
             while (ind < cnt && ind < BatteryImages.Length)
             {
                 BatteryImages[ind].color = color;
@@ -57,56 +61,95 @@ namespace GreatDevResh.AppliedStuff.AllDays
 
         private void SetActivities(Day dayData, in bool sortingDefaultValue, in List<string> sortingGroupElse)
         {
-            ConsistencyBaseClass best = null, worst = null;
+            List<ConsistencyBaseClass> topActivities = new List<ConsistencyBaseClass>();
+            ConsistencyBaseClass worst = null;
             // List<ConsistencyBaseClass> activities = dayData.activities.CopyTo(activities);
-            
-            
-            foreach (var activity in dayData.activities)
+
+            for (int indOfBlock = 0; indOfBlock < CountOfActivityBlocks - 1; ++indOfBlock)
             {
-                if (!(sortingDefaultValue ^ sortingGroupElse.Contains(activity.group)))
-                    continue;
-                
-                if (best is null || activity.GetCompleteness() > best.GetCompleteness())
+                ConsistencyBaseClass best = null;
+                foreach (var activity in dayData.activities)
                 {
-                    best = activity;
+                    if (!(sortingDefaultValue ^ sortingGroupElse.Contains(activity.group)))
+                        continue;
+
+                    bool containsAlready = topActivities.Aggregate(false, (current, existedActivity) 
+                        => current || activity.Title == existedActivity.Title);
+                    if (containsAlready)
+                        continue;
+
+                    if (best is null || activity.GetCompleteness() > best.GetCompleteness())
+                    {
+                        best = activity;
+                    }
                 }
+
+                if (best == null)
+                    break;
+                topActivities.Add(best);
             }
-            
+
             foreach (var activity in dayData.activities)
             {
                 if (!(sortingDefaultValue ^ sortingGroupElse.Contains(activity.group)))
                     continue;
                 
-                if (activity.Title != best.Title && (worst is null || activity.CanBeCompleted() &&
-                           (activity.GetCompleteness() <= worst.GetCompleteness() || !worst.CanBeCompleted())))
+                bool containsAlready = topActivities.Aggregate(false, (current, existedActivity) 
+                    => current || activity.Title == existedActivity.Title);
+                if (containsAlready)
+                    continue;
+                
+                if (worst is null || activity.CanBeCompleted() &&
+                           (activity.GetCompleteness() <= worst.GetCompleteness() || !worst.CanBeCompleted()))
                     worst = activity;
             }
 
-            if (best is not null)
+            int ind = 0;
+            foreach (var activity in topActivities)
             {
-                Titles[0].text = best.Title;
-                ResultsTexts[0].text = best.GetStringOfCompleteness();
-                ResultsImages[0].color = colors[Mathf.Clamp(Day.GetNumberOfRatio(best.GetCompleteness()),0, colors.Length - 1)];
+                Titles[ind].text = activity.Title;
+                ResultsTexts[ind].text = activity.GetStringOfCompleteness();
+                Color color;
+                if (activity.CanBeCompleted())
+                    color = colors[Mathf.Clamp(Day.GetNumberOfRatio(activity.GetCompleteness()),0, colors.Length - 1)];
+                else if (activity.HaveSomeProgress())
+                    color = doneWithoutGoal;
+                else
+                    color = inactiveColor;
+                ResultsImages[ind].color = color;
+                ind++;
             }
-            else
-            {
-                Titles[0].text = "";
-                ResultsTexts[0].text = "";
-                ResultsImages[0].color = inactiveColor;
-            }
-
             if (worst is not null)
             {
-                Titles[1].text = worst.Title;
-                ResultsTexts[1].text = worst.GetStringOfCompleteness();
-                ResultsImages[1].color = colors[Mathf.Clamp(Day.GetNumberOfRatio(worst.GetCompleteness()),0, colors.Length - 1)];
+                Titles[ind].text = worst.Title;
+                ResultsTexts[ind].text = worst.GetStringOfCompleteness();
+                Color color;
+                if (worst.CanBeCompleted())
+                    color = colors[Mathf.Clamp(Day.GetNumberOfRatio(worst.GetCompleteness()),0, colors.Length - 1)];
+                else if (worst.HaveSomeProgress())
+                    color = doneWithoutGoal;
+                else
+                    color = inactiveColor;
+                ResultsImages[ind].color = color;
+                ind++;
             }
-            else
+
+            while (ind < CountOfActivityBlocks)
             {
-                Titles[1].text = "";
-                ResultsTexts[1].text = "";
-                ResultsImages[1].color = inactiveColor;
+                Titles[ind].text = "";
+                ResultsTexts[ind].text = "";
+                ResultsImages[ind].color = inactiveColor;
+                ind++;
             }
+        }
+
+        public void SetCountOfBlocks(int value)
+        {
+            CountOfActivityBlocks = value;
+            for (int i = 0; i < value; ++i)
+                Blocks[i].SetActive(true);
+            for (int i = value; i < Blocks.Length; ++i)
+                Blocks[i].SetActive(false);
         }
     }
 }
