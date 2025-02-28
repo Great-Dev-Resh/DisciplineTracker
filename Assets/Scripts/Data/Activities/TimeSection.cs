@@ -17,6 +17,14 @@ namespace GreatDevResh.Data
         {
             lowerRange = upperRange = lowerBoundary = upperBoundary = new TimeClass(0);
         }
+        
+        public TimeSection(TimeClass _lowerBoundary, TimeClass _upperBoundary, TimeClass _lowerRange, TimeClass _upperRange)
+        {
+            lowerBoundary = _lowerBoundary;
+            upperBoundary = _upperBoundary;
+            lowerRange = _lowerRange;
+            upperRange = _upperRange;
+        }
 
         public TimeSection(TimeSection other)
         {

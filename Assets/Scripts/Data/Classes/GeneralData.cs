@@ -34,6 +34,7 @@ namespace GreatDevResh.Data.Classes
             DefaultRegime = 0;
 
             IsCreated = true;
+            SettingsData.Load();
         }
         
         private static void CreateFromString(string str, ref int ind)
@@ -58,6 +59,7 @@ namespace GreatDevResh.Data.Classes
             DefaultRegime = StringHelper.GetNumber(str, ref ind, '}');
 
             IsCreated = true;
+            SettingsData.Load();
         }
         
         public static string ToString()

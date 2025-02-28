@@ -233,7 +233,7 @@ namespace GreatDevResh.Data.Classes
             if (ratio < 0)
                 return -1;
 
-            if (ratio < 0.3f)
+            if (ratio < 0.2f)
                 return 0;
             if (ratio < 0.5f)
                 return 1;

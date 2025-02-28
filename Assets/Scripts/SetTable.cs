@@ -4,7 +4,7 @@ using GreatDevResh.Data.Classes;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class SetTable : MonoBehaviour
+public class SetTable : MonoBehaviour // LEGACY
 {
     [SerializeField] private DayItem _dayPrefab;
     [SerializeField] private GameObject _emptyPrefab;

@@ -33,6 +33,7 @@ namespace GreatDevResh.AppliedStuff.AllDays
         private bool WeeksWereCreated = false;
 
         private const int DaysInWeek = 4;
+        private int ActivitiesInDay;
 
         private void Update()
         {
@@ -128,12 +129,13 @@ namespace GreatDevResh.AppliedStuff.AllDays
             //     weekElements.Add(item.GetComponent<Week>());
             // }
 
+            ActivitiesInDay = SettingsData.CntActivitiesIn4Days;
             for (int i = 0; i < itemsToAdd; ++i)
             {
                 RectTransform RT = Instantiate(weekPrefab, contentTransform);
                 RT.SetAsLastSibling();
                 weekElements.Add(RT.GetComponent<Week>());
-                weekElements[^1].SetDays(DaysInWeek, 5);
+                weekElements[^1].SetDays(DaysInWeek, ActivitiesInDay);
             }
 
             CalculateDateOfLastWeek();
@@ -175,11 +177,27 @@ namespace GreatDevResh.AppliedStuff.AllDays
                 dayOfLastWeek += DateOfLastWeek.AmountOfDays();
             }
         }
+        
+        private void UpdateCntActivitiesInDays()
+        {
+            foreach (var week in weekElements)
+            {
+                week.UpdateCntActivitiesInDay(ActivitiesInDay);
+            }
+        }
 
         private void OnEnable()
         {
             if (WeeksWereCreated)
+            {
+                if (ActivitiesInDay != SettingsData.CntActivitiesIn4Days)
+                {
+                    ActivitiesInDay = SettingsData.CntActivitiesIn4Days;
+                    UpdateCntActivitiesInDays();
+                }
+                
                 RecalculateNumbers();
+            }
         }
     }
 }

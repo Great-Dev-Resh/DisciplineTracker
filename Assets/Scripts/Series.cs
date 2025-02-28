@@ -2,7 +2,7 @@
 using TMPro;
 using UnityEngine;
 
-public class Series : MonoBehaviour
+public class Series : MonoBehaviour // LEGACY
 {
     [SerializeField] private GameObject[] columns;
     [SerializeField] private TMP_Text[] currentSeries;

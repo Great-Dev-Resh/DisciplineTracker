@@ -2,7 +2,7 @@
 
 namespace GreatDevResh
 {
-    public class BTN_with_index : MonoBehaviour
+    public class BTN_with_index : MonoBehaviour // LEGACY
     {
         private int index;
         private int smallChange, bigChange;

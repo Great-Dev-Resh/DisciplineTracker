@@ -115,12 +115,15 @@ namespace GreatDevResh.AppliedStuff.AllDays
                 items.Add(Instantiate(dayPrefab, transform));
                 items[^1].gameObject.SetActive(false);
                 items[^1].SetCountOfBlocks(cntActivitiesInDay);
-                
-                // empties.Add(Instantiate(emptyPrefab, transform));
-                // empties[^1].gameObject.SetActive(false);
-                //
-                // emptiesWithDot.Add(Instantiate(emptyWithDotPrefab, transform));
-                // emptiesWithDot[^1].gameObject.SetActive(false);
+            }
+        }
+
+        public void UpdateCntActivitiesInDay(int cnt)
+        {
+            cntActivitiesInDay = cnt;
+            foreach (var day in items)
+            {
+                day.SetCountOfBlocks(cntActivitiesInDay);
             }
         }
     }

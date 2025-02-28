@@ -84,7 +84,8 @@ public static class Info
         {
             Store[now.Int()].days[DateController.Day] = new Day(GeneralData.Regimes[GeneralData.DefaultRegime]);
             SaveToday();
-            StatisticsData.AddDay(now, DateController.Day);
+            // StatisticsData.AddDay(now, DateController.Day);
+            StatisticsData.RecalculateAll(); // TODO: optimize this
             StatisticsData.SaveData();
         }
     }

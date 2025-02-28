@@ -1,4 +1,5 @@
 ﻿using System;
+using GreatDevResh.AppliedStuff.Translation;
 using UnityEngine;
 
 namespace GreatDevResh.AppliedStuff
@@ -7,6 +8,8 @@ namespace GreatDevResh.AppliedStuff
     {
         [SerializeField] private GameObject[] OnFirstTimeDisable;
         [SerializeField] private GameObject[] OnFirstTimeEnable;
+
+        [SerializeField] private TranslationTable translationTable;
 
         private int currentDay;
 
@@ -23,6 +26,7 @@ namespace GreatDevResh.AppliedStuff
             }
 
             currentDay = DateController.Day;
+            TranslationTable.Instance = translationTable;
         }
         
         private void Update()

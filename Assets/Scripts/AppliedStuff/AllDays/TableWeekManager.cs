@@ -32,6 +32,7 @@ namespace GreatDevResh.AppliedStuff.AllDays
         private List<string> sortingGroupsElse;
 
         private const int JumpAmount = 3;
+        private int ActivitiesInDay;
 
         private bool WeeksWereCreated = false;
 
@@ -124,17 +125,14 @@ namespace GreatDevResh.AppliedStuff.AllDays
                 Mathf.CeilToInt(viewPortTransform.rect.width / (items[0].rect.width + HorizontalLayoutContentGroup.spacing));
 
             weekElements = new List<Week>();
-            // foreach (var item in items)
-            // {
-            //     weekElements.Add(item.GetComponent<Week>());
-            // }
 
+            ActivitiesInDay = SettingsData.CntActivitiesIn7Days;
             for (int i = 0; i < itemsToAdd; ++i)
             {
                 RectTransform RT = Instantiate(weekPrefab, contentTransform);
                 RT.SetAsLastSibling();
                 weekElements.Add(RT.GetComponent<Week>());
-                weekElements[^1].SetDays(7, 2);
+                weekElements[^1].SetDays(7, ActivitiesInDay);
             }
 
             CalculateDateOfLastWeek();
@@ -182,10 +180,26 @@ namespace GreatDevResh.AppliedStuff.AllDays
             }
         }
 
+        private void UpdateCntActivitiesInDays()
+        {
+            foreach (var week in weekElements)
+            {
+                week.UpdateCntActivitiesInDay(ActivitiesInDay);
+            }
+        }
+
         private void OnEnable()
         {
             if (WeeksWereCreated)
+            {
+                if (ActivitiesInDay != SettingsData.CntActivitiesIn7Days)
+                {
+                    ActivitiesInDay = SettingsData.CntActivitiesIn7Days;
+                    UpdateCntActivitiesInDays();
+                }
+                
                 RecalculateNumbers();
+            }
         }
     }
 }

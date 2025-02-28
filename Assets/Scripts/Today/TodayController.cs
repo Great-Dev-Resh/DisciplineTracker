@@ -8,7 +8,7 @@ using UnityEngine;
 using UnityEngine.Serialization;
 using UnityEngine.UI;
 
-public class TodayController : MonoBehaviour
+public class TodayController : MonoBehaviour // LEGACY
 {
     [SerializeField] private SetTable _setTable;
     

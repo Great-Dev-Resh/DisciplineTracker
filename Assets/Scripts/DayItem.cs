@@ -7,7 +7,7 @@ using UnityEngine;
 using UnityEngine.Serialization;
 using UnityEngine.UI;
 
-public class DayItem : MonoBehaviour
+public class DayItem : MonoBehaviour // LEGACY
 {
     [SerializeField] private TMP_Text dayText;
     

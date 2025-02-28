@@ -5,7 +5,7 @@ using UnityEngine.UI;
 
 namespace GreatDevResh
 {
-    public class AmountValueTodayManager : MonoBehaviour
+    public class AmountValueTodayManager : MonoBehaviour // LEGACY
     {
         private AmountClass amountClass;
 

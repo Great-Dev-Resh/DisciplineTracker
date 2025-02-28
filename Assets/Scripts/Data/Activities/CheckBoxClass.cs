@@ -22,7 +22,7 @@
 
         public override string GetStringOfCompleteness()
         {
-            return Completed ? "Done" : "Failed";
+            return Completed ? "Done" : "Missed";
         }
 
         public override string ToString()

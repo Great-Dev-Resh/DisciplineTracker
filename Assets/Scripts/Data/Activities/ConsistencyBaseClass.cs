@@ -1,4 +1,5 @@
-﻿using GreatDevResh.Data.Classes;
+﻿using GreatDevResh.AppliedStuff;
+using GreatDevResh.Data.Classes;
 using GreatDevResh.Data.Interfaces;
 using GreatDevResh.MultiUseful;
 
@@ -17,6 +18,7 @@ namespace GreatDevResh.Data
         {
             Title = "";
             weight = 1;
+            group = GroupDropDown.Without_Group;
         }
 
         public virtual float GetCompleteness() => 1;

@@ -24,10 +24,11 @@ namespace GreatDevResh.AppliedStuff.AllDays
 
         private int CountOfActivityBlocks = 2;
 
-        public void Init(MyDate date, int day, in bool sortingDefaultValue, in List<string> sortingGroupElse)
+        public void Init(MyDate date, int day, in bool sortingDefaultValue, in List<string> sortingGroupElse, Day dayData = null)
         {
             DateText.text = day + "." + date.Month + "." + date.Year;
-            Day dayData = Info.Store[date.Int()].days[day];
+            if (dayData is null)
+                dayData = Info.Store[date.Int()].days[day];
             if (dayData is null)
                 return;
 
