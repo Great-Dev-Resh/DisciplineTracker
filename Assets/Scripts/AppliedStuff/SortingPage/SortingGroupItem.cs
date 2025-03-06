@@ -19,7 +19,7 @@ namespace GreatDevResh.AppliedStuff.SortingPage
         {
             isOn = value;
             Color color = CheckMarkImage.color;
-            color.a = value ? 1 : 0;
+            color.a = value ? 0.95f : 0;
             CheckMarkImage.color = color;
         }
 

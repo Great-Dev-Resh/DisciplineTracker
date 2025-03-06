@@ -22,7 +22,10 @@ namespace GreatDevResh.AppliedStuff.SortingPage
 
         private List<string> groups; // include WITHOUT_GROUP
         private List<bool> isGroupActive;
+        private List<bool> isGroupActiveLastTime;
         private bool isActiveOthers = true;
+        private bool isActiveOthersLastTime = true;
+        
         private int localGroupUpdateVersion = -1;
 
         private const string OTHER_GROUPS = "Other groups";
@@ -90,6 +93,7 @@ namespace GreatDevResh.AppliedStuff.SortingPage
 
             groups = newGroups;
             isGroupActive = actives;
+            isGroupActiveLastTime = new List<bool>(isGroupActive);
         }
 
         public void SetAllTo(bool value)
@@ -112,6 +116,9 @@ namespace GreatDevResh.AppliedStuff.SortingPage
         private List<string> elseGroups;
         public void Sort()
         {
+            isGroupActiveLastTime = new List<bool>(isGroupActive);
+            isActiveOthersLastTime = isActiveOthers;
+            
             elseGroups = new List<string>();
             for (int i = 0; i < groups.Count(); ++i)
             {
@@ -125,14 +132,26 @@ namespace GreatDevResh.AppliedStuff.SortingPage
             TableThreeDays.SetNewSorting(in isActiveOthers, in elseGroups);
             HorizontalWeekManager.SetNewSorting(in isActiveOthers, in elseGroups);
 
-            if (elseGroups.Count > 1)
-                BTN_SortText.text = "Mixed groups";
-            else if (elseGroups.Count == 1)
+            if (elseGroups.Count == 1 && !isActiveOthers)
                 BTN_SortText.text = elseGroups[0];
+            else if (elseGroups.Count >= 1)
+                BTN_SortText.text = "Mixed groups";
             else if (isActiveOthers)
                 BTN_SortText.text = "All groups";
             else
                 BTN_SortText.text = "Nothing";
+        }
+
+        public void Cancel()
+        {
+            for (int i = 0; i < groups.Count; ++i)
+            {
+                isGroupActive[i] = isGroupActiveLastTime[i];
+                items[i].SetCheckMark(isGroupActive[i]);
+            }
+
+            isActiveOthers = isActiveOthersLastTime;
+            items[groups.Count].SetCheckMark(isActiveOthers);
         }
     }
 }

@@ -147,7 +147,8 @@ namespace GreatDevResh.AppliedStuff.AllDays
             int dayOfWeek = DateController.DayOfWeek <= 0 ? 7 : DateController.DayOfWeek;
             dayOfFirstWeek -= dayOfWeek - 8;
 
-            sortingGroupsElse = new List<string>();
+            if (sortingGroupsElse is null)
+                sortingGroupsElse = new List<string>();
 
             if (dayOfFirstWeek < 1)
             {

@@ -2,6 +2,7 @@
 using GreatDevResh.Data.Classes;
 using TMPro;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 namespace GreatDevResh.AppliedStuff.Settings
 {
@@ -15,7 +16,8 @@ namespace GreatDevResh.AppliedStuff.Settings
                 return;
             SettingsData.LanguageInd = DD_Language.value;
             SettingsData.Save();
-            Application.Quit();
+            SceneManager.LoadScene(0);
+            //Application.Quit();
         }
 
         private void Init()

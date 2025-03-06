@@ -50,7 +50,7 @@ namespace GreatDevResh.AppliedStuff.AllDays
 
             float width = (items[0].rect.width + HorizontalLayoutContentGroup.spacing) * jumpAmount;
             while (contentTransform.localPosition.x > 0 &&
-                (DateOfLastWeek > GeneralData.startDate || DateOfLastWeek == GeneralData.startDate && dayOfLastWeek >= GeneralData.startDay - 3))
+                (DateOfLastWeek > GeneralData.startDate || DateOfLastWeek == GeneralData.startDate && dayOfLastWeek >= GeneralData.startDay))
             {
                 Canvas.ForceUpdateCanvases();
                 isContentPositionUpdated = true;
@@ -169,7 +169,7 @@ namespace GreatDevResh.AppliedStuff.AllDays
 
         private void CalculateDateOfLastWeek()
         {
-            dayOfLastWeek = dayOfFirstWeek - DaysInWeek * weekElements.Count;
+            dayOfLastWeek = dayOfFirstWeek - DaysInWeek * (weekElements.Count - 1);
             DateOfLastWeek = new MyDate(ref DateOfFirstWeek);
             while (dayOfLastWeek < 1)
             {

@@ -90,20 +90,31 @@ namespace GreatDevResh.Data.Classes
         {
             Debug.Log("Changind to " + regime.Name);
             NameOfRegime = regime.Name;
-            List<ConsistencyBaseClass> newActivities = activities.Where(activity => activity.HaveSomeProgress()).ToList();
+            List<ConsistencyBaseClass> newActivities = new List<ConsistencyBaseClass>();
+            List<ConsistencyBaseClass> activitiesWithProgress = 
+                activities.Where(activity => activity.HaveSomeProgress()).ToList();
 
             foreach (var activity in regime.activities)
             {
-                bool contains = false;
-                foreach (var item in newActivities)
+                int contains = -1;
+                for (int i = 0; i < activitiesWithProgress.Count(); ++i)
                 {
-                    if (item.Title != activity.Title) continue;
-                    contains = true;
-                    item.CopySettings(activity, false);
+                    if (activitiesWithProgress[i].Title != activity.Title) continue;
+                    contains = i;
                     break;
                 }
-                if (!contains)
+                if (contains == -1) {
                     newActivities.Add(ConsistencyBaseClass.MakeSame(activity));
+                } else {
+                    newActivities.Add(activitiesWithProgress[contains]);
+                    newActivities[^1].CopySettings(activity, false);
+                    activitiesWithProgress.RemoveAt(contains);
+                }
+            }
+
+            foreach (var activity in activitiesWithProgress)
+            {
+                newActivities.Add(activity);
             }
 
             activities = newActivities;

@@ -1,6 +1,7 @@
 ﻿using System;
 using GreatDevResh.AppliedStuff.Translation;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 namespace GreatDevResh.AppliedStuff
 {
@@ -10,6 +11,8 @@ namespace GreatDevResh.AppliedStuff
         [SerializeField] private GameObject[] OnFirstTimeEnable;
 
         [SerializeField] private TranslationTable translationTable;
+
+        [SerializeField] private GameObject RestartDayPage;
 
         private int currentDay;
 
@@ -32,7 +35,27 @@ namespace GreatDevResh.AppliedStuff
         private void Update()
         {
             if (DateController.Day != currentDay)
-                Application.Quit();
+            {
+                MyDate nextMonth = new MyDate(ref Info.now);
+                nextMonth.Month++;
+                if (DateController.Day > 1 && currentDay + 1 == DateController.Day || 
+                    DateController.Day == Info.now.AmountOfDays() && DateController.Day == 1 &&
+                    DateController.Month == nextMonth.Month && DateController.Year == nextMonth.Year)
+                {
+                    currentDay = DateController.Day;
+                    RestartDayPage.SetActive(true);
+                }
+                else
+                {
+                    GlobalReload();
+                }
+            }
+        }
+
+        public void GlobalReload()
+        {
+            Info.ForcedReInit();
+            SceneManager.LoadScene(0);
         }
     }
 }

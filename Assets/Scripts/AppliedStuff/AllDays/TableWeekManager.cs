@@ -25,7 +25,7 @@ namespace GreatDevResh.AppliedStuff.AllDays
 
         private MyDate DateOfFirstWeek;
         private int dayOfFirstWeek;
-        private MyDate DateOfLastWeek; // not include last week
+        private MyDate DateOfLastWeek;
         private int dayOfLastWeek;
 
         private bool sortingDefaultValue = true;
@@ -171,7 +171,7 @@ namespace GreatDevResh.AppliedStuff.AllDays
 
         private void CalculateDateOfLastWeek()
         {
-            dayOfLastWeek = dayOfFirstWeek - 7 * weekElements.Count;
+            dayOfLastWeek = dayOfFirstWeek - 7 * weekElements.Count + 7;
             DateOfLastWeek = new MyDate(ref DateOfFirstWeek);
             while (dayOfLastWeek < 1)
             {

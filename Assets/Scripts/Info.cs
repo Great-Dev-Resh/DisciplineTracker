@@ -90,6 +90,12 @@ public static class Info
         }
     }
 
+    public static void ForcedReInit()
+    {
+        _isInit = false;
+        Init();
+    }
+
     private static void GetGeneralData()
     {
         GeneralData.Load();

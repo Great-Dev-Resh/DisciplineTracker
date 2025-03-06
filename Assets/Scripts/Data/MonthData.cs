@@ -80,14 +80,14 @@ public class MonthData
         }
         
         days = new List<Day>(new Day[count]);
-        var lenghts = new List<int>(new int[count]);
+        var lengths = new List<int>(new int[count]);
 
         ++i;
         for (int j = 0; j < count; ++j)
         {
             while (str[i] != '\n')
             {
-                lenghts[j] = lenghts[j] * 10 + str[i++] - '0';
+                lengths[j] = lengths[j] * 10 + str[i++] - '0';
             }
 
             ++i;
@@ -96,10 +96,13 @@ public class MonthData
         for (int j = 0; j < count; ++j)
         {
             string cur = "";
-            for (int k = 0; k < lenghts[j]; ++k)
+            for (int k = 0; k < lengths[j]; ++k)
                 cur += str[i++];
             DayVersionZero day = JsonUtility.FromJson<DayVersionZero>(cur);
-            days[j] = new Day(day);
+            if (day is null)
+                days[j] = null;
+            else
+                days[j] = new Day(day);
         }
     }
 }

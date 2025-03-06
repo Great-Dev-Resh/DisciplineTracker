@@ -144,19 +144,36 @@ namespace GreatDevResh.AppliedStuff
 
         private void AmUpdateSegmentImage()
         {
-            if (Am_segmentSprites.Length < 5)
+            if (Am_segmentSprites.Length < 7)
             {
-                Debug.LogWarning("We have lack of sprites!");
+                Debug.Log("We have lack of sprites!");
                 return;
             }
 
-            Am_segmentIllustration.sprite = ((Am_lowerBoundaryActive ? 1 : 0) + (Am_upperBoundaryActive ? 2 : 0)) switch
+            if (Am_lowerBoundaryActive && !Am_upperBoundaryActive && Am_lowerRange <= 0)
             {
-                1 => Am_segmentSprites[1],
-                2 => Am_segmentSprites[2],
-                3 => Am_segmentSprites[Am_lowerBoundary <= Am_upperBoundary ? 3 : 4],
-                _ => Am_segmentSprites[0]
-            };
+                Am_segmentIllustration.sprite = Am_segmentSprites[0];
+            } else if (Am_lowerBoundaryActive && !Am_upperBoundaryActive)
+            {
+                Am_segmentIllustration.sprite = Am_segmentSprites[1];
+            } else if (!Am_lowerBoundaryActive && Am_upperBoundaryActive && Am_upperBoundary <= 0)
+            {
+                Am_segmentIllustration.sprite = Am_segmentSprites[2];
+            } else if (!Am_lowerBoundaryActive && Am_upperBoundaryActive)
+            {
+                Am_segmentIllustration.sprite = Am_segmentSprites[3];
+            } else if (Am_lowerRange <= 0 && Am_lowerBoundaryActive && Am_upperBoundaryActive)
+            {
+                Am_segmentIllustration.sprite = Am_segmentSprites[4];
+            }
+            else if (Am_lowerBoundaryActive && Am_upperBoundaryActive)
+            {
+                Am_segmentIllustration.sprite = Am_segmentSprites[5];
+            }
+            else
+            {
+                Am_segmentIllustration.sprite = Am_segmentSprites[6];
+            }
         }
 
         public void StartCreating()
@@ -179,10 +196,10 @@ namespace GreatDevResh.AppliedStuff
             GroupDropDown.SetSelectedItem(GroupDropDown.Without_Group);
             Weight_IF.text = "1";
             
-            Am_lowerBoundary_IF.text = "10";
+            Am_lowerBoundary_IF.text = "10"; // it calls functions, also update image
             Am_upperBoundary_IF.text = "20";
             Am_lowerRange_IF.text = "0";
-            Am_upperRange_IF.text = "0";
+            Am_upperRange_IF.text = "30";
             Am_defaultValue_IF.text = "0";
 
             Am_toggleLowerBoundary.isOn = true;
@@ -272,14 +289,53 @@ namespace GreatDevResh.AppliedStuff
 
         public void SetChDefaultValue(bool value) => Ch_defaultValue = value;
 
+        public void Am_EndEditing()
+        {
+            if (Am_lowerBoundary_IF.text == "")
+            {
+                Am_lowerBoundary = 0;
+                Am_lowerBoundary_IF.SetTextWithoutNotify("0");
+            }
+            
+            if (Am_lowerRange > Am_lowerBoundary || Am_lowerRange_IF.text == "")
+            {
+                Am_lowerRange = Am_lowerRange_IF.text == "" ? 0 : Am_lowerBoundary;
+                Am_lowerRange_IF.SetTextWithoutNotify(Am_lowerRange.ToString());
+            }
+
+            if (Am_upperBoundary < Am_lowerBoundary && Am_lowerBoundaryActive || Am_upperBoundary_IF.text == "")
+            {
+                Am_upperBoundary = Am_lowerBoundaryActive ? Am_lowerBoundary : 0;
+                Am_upperBoundary_IF.SetTextWithoutNotify(Am_upperBoundary.ToString());
+            }
+
+            if (Am_upperRange < Am_upperBoundary || Am_upperRange_IF.text == "")
+            {
+                Am_upperRange = Am_upperBoundary;
+                Am_upperRange_IF.SetTextWithoutNotify(Am_upperRange.ToString());
+            }
+
+            if (Am_defaultValue_IF.text == "")
+            {
+                Am_defaultValue = 0;
+                Am_defaultValue_IF.SetTextWithoutNotify("0");
+            }
+            
+            AmUpdateSegmentImage();
+        }
 
         public void SetAmDefaultValue(string value)
         {
             if (value is null or "")
+            {
+                Am_defaultValue = 0;
                 return;
+            }
+
             if (value[0] == '-')
             {
                 Am_defaultValue_IF.text = "";
+                Am_defaultValue = 0;
                 return;
             }
 
@@ -290,13 +346,14 @@ namespace GreatDevResh.AppliedStuff
         {
             if (value is null or "")
             {
-                Am_lowerBoundary = -1;
+                Am_lowerBoundary = 0;
                 return;
             }
 
             if (value[0] == '-' && value != "-1")
             {
                 Am_lowerBoundary_IF.text = "";
+                Am_lowerBoundary = 0;
                 return;
             }
 
@@ -307,13 +364,14 @@ namespace GreatDevResh.AppliedStuff
         {
             if (value is null or "")
             {
-                Am_upperBoundary = -1;
+                Am_upperBoundary = 0;
                 return;
             }
 
             if (value[0] == '-' && value != "-1")
             {
                 Am_upperBoundary_IF.text = "";
+                Am_upperBoundary = 0;
                 return;
             }
 
@@ -323,10 +381,15 @@ namespace GreatDevResh.AppliedStuff
         public void SetAmLowerRange(string value)
         {
             if (value is null or "")
+            {
+                Am_lowerRange = 0;
                 return;
+            }
+
             if (value[0] == '-')
             {
                 Am_lowerRange_IF.text = "";
+                Am_lowerRange = 0;
                 return;
             }
 
@@ -336,10 +399,15 @@ namespace GreatDevResh.AppliedStuff
         public void SetAmUpperRange(string value)
         {
             if (value is null or "")
+            {
+                Am_upperRange = 0;
                 return;
+            }
+
             if (value[0] == '-')
             {
                 Am_upperRange_IF.text = "";
+                Am_upperRange = 0;
                 return;
             }
 
