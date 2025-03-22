@@ -23,6 +23,9 @@ namespace GreatDevResh.AppliedStuff
 
         [SerializeField] private Toggle Toggle_upperBoundary;
 
+        [SerializeField] private Image DiagramImage;
+        [SerializeField] private Sprite[] DiagramSprites;
+
         public void Init(AmountClass _amountClass)
         {
             amountClass = _amountClass;
@@ -38,20 +41,60 @@ namespace GreatDevResh.AppliedStuff
             isUpdatingPicture = true;
             Title.text = amountClass.Title;
             UpdateGroupVisual();
+            UpdateDiagram();
 
             Toggle_lowerBoundary.isOn = amountClass.section.lowerBoundary != -1;
             Toggle_upperBoundary.isOn = amountClass.section.upperBoundary != -1;
             
-            IF_lowerBoundary.text = amountClass.section.lowerBoundary.ToString();
-            IF_upperBoundary.text = amountClass.section.upperBoundary.ToString();
-            IF_lowerRange.text = amountClass.section.GetLowerBorderMinusRange().ToString();
-            IF_upperRange.text = amountClass.section.GetUpperBorderPlusRange().ToString();
+            IF_lowerBoundary.SetTextWithoutNotify(amountClass.section.lowerBoundary.ToString());
+            IF_upperBoundary.SetTextWithoutNotify(amountClass.section.upperBoundary.ToString());
+            IF_lowerRange.SetTextWithoutNotify(amountClass.section.GetLowerBorderMinusRange().ToString());
+            IF_upperRange.SetTextWithoutNotify(amountClass.section.GetUpperBorderPlusRange().ToString());
 
-            IF_defaultValue.text = amountClass.defaultValue.ToString();
+            IF_defaultValue.SetTextWithoutNotify(amountClass.defaultValue.ToString());
             
             Weight_IF.SetNumber(amountClass.weight);
 
             isUpdatingPicture = false;
+        }
+
+        private void UpdateDiagram()
+        {
+            if (DiagramSprites.Length < 7)
+            {
+                Debug.Log("We have lack of sprites!");
+                return;
+            }
+            
+            bool lbActive = amountClass.section.lowerBoundary != -1;
+            bool ubActive = amountClass.section.upperBoundary != -1;
+            int lowerRange = amountClass.section.GetLowerBorderMinusRange();
+            int upperRange = amountClass.section.upperBoundary;
+
+            if (lbActive && !ubActive && lowerRange <= 0)
+            {
+                DiagramImage.sprite = DiagramSprites[0];
+            } else if (lbActive && !ubActive)
+            {
+                DiagramImage.sprite = DiagramSprites[1];
+            } else if (!lbActive && ubActive && upperRange <= 0)
+            {
+                DiagramImage.sprite = DiagramSprites[2];
+            } else if (!lbActive && ubActive)
+            {
+                DiagramImage.sprite = DiagramSprites[3];
+            } else if (lowerRange <= 0 && lbActive && ubActive)
+            {
+                DiagramImage.sprite = DiagramSprites[4];
+            }
+            else if (lbActive && ubActive)
+            {
+                DiagramImage.sprite = DiagramSprites[5];
+            }
+            else
+            {
+                DiagramImage.sprite = DiagramSprites[6];
+            }
         }
 
         protected override void UpdateGroupVisual()

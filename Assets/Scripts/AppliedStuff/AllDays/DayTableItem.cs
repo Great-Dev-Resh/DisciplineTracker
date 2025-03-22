@@ -2,6 +2,7 @@
 using System.Linq;
 using GreatDevResh.Data;
 using GreatDevResh.Data.Classes;
+using GreatDevResh.Data.LocalHelpers;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -18,13 +19,14 @@ namespace GreatDevResh.AppliedStuff.AllDays
         [SerializeField] private GameObject[] Blocks;
 
         [SerializeField] private Image[] BatteryImages;
-        [SerializeField] private Color[] colors;
-        [SerializeField] private Color inactiveColor;
-        [SerializeField] private Color doneWithoutGoal;
+        [SerializeField] private DayColors dayColors;
+        // [SerializeField] private Color[] colors;
+        // [SerializeField] private Color inactiveColor;
+        // [SerializeField] private Color doneWithoutGoal;
 
         private int CountOfActivityBlocks = 2;
 
-        public void Init(MyDate date, int day, in bool sortingDefaultValue, in List<string> sortingGroupElse, Day dayData = null)
+        public void Init(MyDate date, int day, in bool sortingDefaultValue, in List<string> sortingGroupElse, bool asWholeGroups, Day dayData = null)
         {
             DateText.text = day + "." + date.Month + "." + date.Year;
             if (dayData is null)
@@ -34,18 +36,20 @@ namespace GreatDevResh.AppliedStuff.AllDays
 
             NameText.text = dayData.NameOfRegime;
 
-            SetActivities(dayData, in sortingDefaultValue, in sortingGroupElse);
+            if (asWholeGroups)
+                SetWholeGroups(dayData, in sortingDefaultValue, in sortingGroupElse);
+            else
+                SetActivities(dayData, in sortingDefaultValue, in sortingGroupElse);
             SetBattery(dayData, in sortingDefaultValue, in sortingGroupElse);
 
         }
 
         private void SetBattery(Day dayData, in bool sortingDefaultValue, in List<string> sortingGroupElse)
         {
-            Color color = colors[Mathf.Max(Mathf.Min(
-                dayData.GetNumberOfRatio(in sortingDefaultValue, in sortingGroupElse), colors.Length - 1), 0)];
+            float ratio = dayData.GetRawRatio(in sortingDefaultValue, in sortingGroupElse);
+            Color color = dayColors.RatioToColor(ratio);
 
             int ind = 0;
-            float ratio = dayData.GetRawRatio(in sortingDefaultValue, in sortingGroupElse);
             int cnt = (int)(BatteryImages.Length * ratio + (ratio is > 0.6f and < 0.9f ? 0.41f : (ratio is > 0.6f and < 0.92f ? 0.2f : 0)));
             while (ind < cnt && ind < BatteryImages.Length)
             {
@@ -55,9 +59,69 @@ namespace GreatDevResh.AppliedStuff.AllDays
 
             while (ind < BatteryImages.Length)
             {
-                BatteryImages[ind].color = inactiveColor;
+                BatteryImages[ind].color = dayColors.defaultColor;
                 ind++;
             }
+        }
+
+        private void SetWholeGroups(Day dayData, in bool sortingDefaultValue, in List<string> sortingGroupElse)
+        {
+            Dictionary<string, float> completeness = new Dictionary<string, float>();
+            Dictionary<string, int> cnt = new Dictionary<string, int>();
+            Dictionary<string, bool> done = new Dictionary<string, bool>();
+            List<string> groups = new List<string>();
+            
+            foreach (var activity in dayData.activities)
+            {
+                if (!(sortingDefaultValue ^ sortingGroupElse.Contains(activity.group)) || 
+                    !activity.CanBeCompleted() && !activity.HaveSomeProgress())
+                    continue;
+
+                if (!completeness.ContainsKey(activity.group))
+                {
+                    groups.Add(activity.group);
+                    completeness.Add(activity.group, 0);
+                    cnt.Add(activity.group, 0);
+                    done.Add(activity.group, true);
+                }
+
+                if (activity.CanBeCompleted())
+                {
+                    completeness[activity.group] += activity.GetCompleteness() * activity.weight;
+                    cnt[activity.group] += activity.weight;
+                    if (activity.GetCompleteness() < 0.998f)
+                        done[activity.group] = false;
+                }
+            }
+
+            groups = groups.OrderBy(group => cnt[group] != 0 ? -completeness[group] / cnt[group] : 1).ToList();
+
+            for (int blockInd = 0; blockInd < CountOfActivityBlocks; ++blockInd)
+            {
+                if (blockInd >= groups.Count)
+                {
+                    SetBlock(blockInd, "", "", dayColors.defaultColor);
+                } else if (blockInd == CountOfActivityBlocks - 1)
+                {
+                    int ind = groups.Count - 1;
+                    while (ind > blockInd && cnt[groups[ind]] == 0)
+                        --ind;
+                    SetGroupToBlock(blockInd, groups[ind], completeness[groups[ind]] / cnt[groups[ind]], done[groups[ind]]);
+                } else
+                {
+                    SetGroupToBlock(blockInd, groups[blockInd], completeness[groups[blockInd]] / cnt[groups[blockInd]], done[groups[blockInd]]);
+                }
+            }
+        }
+
+        private void SetGroupToBlock(int ind, string name, float ratio, bool done)
+        {
+            if (!done)
+                ratio = Mathf.Min(ratio, 0.99f);
+            if (ratio < 1000000) 
+                SetBlock(ind, name, Mathf.FloorToInt(ratio * 100) + "%", dayColors.RatioToColor(ratio));
+            else
+                SetBlock(ind, name, "---", dayColors.doneWithoutGoal);
         }
 
         private void SetActivities(Day dayData, in bool sortingDefaultValue, in List<string> sortingGroupElse)
@@ -108,40 +172,41 @@ namespace GreatDevResh.AppliedStuff.AllDays
             int ind = 0;
             foreach (var activity in topActivities)
             {
-                Titles[ind].text = activity.Title;
-                ResultsTexts[ind].text = activity.GetStringOfCompleteness();
                 Color color;
                 if (activity.CanBeCompleted())
-                    color = colors[Mathf.Clamp(Day.GetNumberOfRatio(activity.GetCompleteness()),0, colors.Length - 1)];
+                    color = dayColors.RatioToColor(activity.GetCompleteness());
                 else if (activity.HaveSomeProgress())
-                    color = doneWithoutGoal;
+                    color = dayColors.doneWithoutGoal;
                 else
-                    color = inactiveColor;
-                ResultsImages[ind].color = color;
+                    color = dayColors.defaultColor;
+                SetBlock(ind, activity.Title, activity.GetStringOfCompleteness(), color);
                 ind++;
             }
             if (worst is not null)
             {
-                Titles[ind].text = worst.Title;
-                ResultsTexts[ind].text = worst.GetStringOfCompleteness();
                 Color color;
                 if (worst.CanBeCompleted())
-                    color = colors[Mathf.Clamp(Day.GetNumberOfRatio(worst.GetCompleteness()),0, colors.Length - 1)];
+                    color = dayColors.RatioToColor(worst.GetCompleteness());
                 else if (worst.HaveSomeProgress())
-                    color = doneWithoutGoal;
+                    color = dayColors.doneWithoutGoal;
                 else
-                    color = inactiveColor;
-                ResultsImages[ind].color = color;
+                    color = dayColors.defaultColor;
+                SetBlock(ind, worst.Title, worst.GetStringOfCompleteness(), color);
                 ind++;
             }
 
             while (ind < CountOfActivityBlocks)
             {
-                Titles[ind].text = "";
-                ResultsTexts[ind].text = "";
-                ResultsImages[ind].color = inactiveColor;
+                SetBlock(ind, "", "", dayColors.defaultColor);
                 ind++;
             }
+        }
+
+        private void SetBlock(int ind, string title, string resText, Color color)
+        {
+            Titles[ind].text = title;
+            ResultsTexts[ind].text = resText;
+            ResultsImages[ind].color = color;
         }
 
         public void SetCountOfBlocks(int value)

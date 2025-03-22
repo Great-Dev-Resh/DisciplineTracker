@@ -26,6 +26,7 @@ namespace GreatDevResh.AppliedStuff.AllDays
         private int dayOfLastWeek;
 
         private bool sortingDefaultValue = true;
+        private bool asWholeGroups = false;
         private List<string> sortingGroupsElse;
 
         private const int jumpAmount = 3;
@@ -105,14 +106,15 @@ namespace GreatDevResh.AppliedStuff.AllDays
             for (int i = 0; i < weekElements.Count; ++i)
             {
                 weekElements[i].UpdateDays(new MyDate(ref DateOfFirstWeek), dayOfFirstWeek - (weekElements.Count - i - 1) * DaysInWeek,
-                    in sortingDefaultValue, in sortingGroupsElse);
+                    in sortingDefaultValue, in sortingGroupsElse, asWholeGroups);
             }
         }
 
-        public void SetNewSorting(in bool defaultValue, in List<string> notDefault)
+        public void SetNewSorting(in bool defaultValue, in List<string> notDefault, bool _asWholeGroups)
         {
             sortingDefaultValue = defaultValue;
             sortingGroupsElse = notDefault;
+            asWholeGroups = _asWholeGroups;
             
             if (gameObject.activeInHierarchy)
                 RecalculateNumbers();

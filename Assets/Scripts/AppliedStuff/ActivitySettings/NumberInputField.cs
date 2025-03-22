@@ -25,7 +25,7 @@ namespace GreatDevResh.AppliedStuff
 
             value = Mathf.Max(value, MinBoundary);
 
-            InputField.text = value.ToString();
+            InputField.SetTextWithoutNotify(value.ToString());
             lastValue = value;
 
             isSettingValue = false;

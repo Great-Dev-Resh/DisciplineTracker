@@ -166,7 +166,7 @@ namespace GreatDevResh.AppliedStuff.AllDays
         
         private void CalculateDateOfLastWeek()
         {
-            dayOfLastWeek = dayOfFirstWeek - 7 * weekElements.Count;
+            dayOfLastWeek = dayOfFirstWeek - 7 * weekElements.Count + 7;
             DateOfLastWeek = new MyDate(ref DateOfFirstWeek);
             while (dayOfLastWeek < 1)
             {

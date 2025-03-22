@@ -8,10 +8,26 @@ namespace GreatDevResh.AppliedStuff.SortingPage
     {
         [SerializeField] private TMP_Text TitleText;
         [SerializeField] private Image CheckMarkImage;
+        [SerializeField] private Image BodyImage;
+
+        [SerializeField] private Color normalColor;
+        [SerializeField] private Color asWholeGroups;
 
         private SortingPageManager manager;
         private int index;
         private bool isOn = true;
+
+        public void Load(string title, bool value, bool isWholeGroups = false)
+        {
+            gameObject.SetActive(true);
+            SetTitle(title);
+            SetCheckMark(value);
+            
+            if (isWholeGroups)
+                BodyImage.color = asWholeGroups;
+            else
+                BodyImage.color = normalColor;
+        }
 
         public void SetTitle(string title) => TitleText.text = title;
 

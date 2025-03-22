@@ -28,7 +28,7 @@ namespace GreatDevResh.AppliedStuff.AllDays
             cntActivitiesInDay = _cntActivitiesInDay;
         }
 
-        public void UpdateDays(MyDate date, int startDay, in bool sortingDefaultValue, in List<string> sortingGroupsElse)
+        public void UpdateDays(MyDate date, int startDay, in bool sortingDefaultValue, in List<string> sortingGroupsElse, bool asWholeGroups)
         {
             if (!wasInit)
                 Init();
@@ -59,7 +59,7 @@ namespace GreatDevResh.AppliedStuff.AllDays
                         if (empties.Count <= emptiesAmount - dots)
                         {
                             empties.Add(ObjectPool.GetObj(emptyPrefab));
-                            empties[^1].transform.parent = transform;
+                            empties[^1].transform.SetParent(transform);
                         }
                         empties[emptiesAmount - dots].gameObject.SetActive(true);
                         empties[emptiesAmount - dots].SetSiblingIndex(i);
@@ -69,7 +69,7 @@ namespace GreatDevResh.AppliedStuff.AllDays
                         if (emptiesWithDot.Count <= dots)
                         {
                             emptiesWithDot.Add(ObjectPool.GetObj(emptyWithDotPrefab));
-                            emptiesWithDot[^1].transform.parent = transform;
+                            emptiesWithDot[^1].transform.SetParent(transform);
                         }
                         emptiesWithDot[dots].gameObject.SetActive(true);
                         emptiesWithDot[dots].SetSiblingIndex(i);
@@ -82,7 +82,7 @@ namespace GreatDevResh.AppliedStuff.AllDays
                 {
                     items[i - emptiesAmount].gameObject.SetActive(true);
                     items[i - emptiesAmount].transform.SetSiblingIndex(i);
-                    items[i - emptiesAmount].Init(new MyDate(ref date), startDay, in sortingDefaultValue, in sortingGroupsElse);
+                    items[i - emptiesAmount].Init(new MyDate(ref date), startDay, in sortingDefaultValue, in sortingGroupsElse, asWholeGroups);
                 }
             
                 startDay++;

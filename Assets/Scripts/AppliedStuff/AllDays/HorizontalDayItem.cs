@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using GreatDevResh.Data.Classes;
+using GreatDevResh.Data.LocalHelpers;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -12,7 +13,8 @@ namespace GreatDevResh.AppliedStuff.AllDays
 
         [SerializeField] private Image ProgressImage;
         [SerializeField] private Image OverloadImage;
-        [SerializeField] private Color[] colors;
+        [SerializeField] private DayColors dayColors;
+        // [SerializeField] private Color[] colors;
         [SerializeField] private TMP_Text ProgressText;
         
         public void Init(MyDate date, int day, in bool sortingDefaultValue, in List<string> sortingGroupElse)
@@ -27,10 +29,9 @@ namespace GreatDevResh.AppliedStuff.AllDays
 
         private void SetProgress(Day dayData, in bool sortingDefaultValue, in List<string> sortingGroupElse)
         {
-            Color color = colors[Mathf.Max(Mathf.Min(
-                dayData.GetNumberOfRatio(in sortingDefaultValue, in sortingGroupElse), colors.Length - 1), 0)];
-            
             float ratio = Mathf.Max(dayData.GetRawRatio(in sortingDefaultValue, in sortingGroupElse), 0);
+            Color color = dayColors.RatioToColor(ratio);
+            
             ProgressImage.color = color;
             ProgressImage.fillAmount = ratio;
             ProgressText.text = Mathf.FloorToInt(ratio * 100) + "%";

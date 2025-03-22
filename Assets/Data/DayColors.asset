@@ -1,0 +1,32 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a7cea42e898f4806ba2e80969b1869f1, type: 3}
+  m_Name: DayColors
+  m_EditorClassIdentifier: 
+  <defaultColor>k__BackingField: {r: 0.23921569, g: 0.23921569, b: 0.23921569, a: 1}
+  <doneWithoutGoal>k__BackingField: {r: 0.3137255, g: 0.38431373, b: 0.3764706, a: 1}
+  <colors>k__BackingField:
+  - {r: 0.5471698, g: 0.14625598, b: 0.14625598, a: 1}
+  - {r: 0.5803922, g: 0.29411766, b: 0.15294118, a: 1}
+  - {r: 0.58431375, g: 0.54509807, b: 0.13333334, a: 1}
+  - {r: 0.5058824, g: 0.59607846, b: 0.25882354, a: 1}
+  - {r: 0.38090292, g: 0.59119487, b: 0.15430555, a: 1}
+  - {r: 0.05199819, g: 0.4716981, b: 0, a: 1}
+  - {r: 0, g: 0.34591186, b: 0.06063864, a: 1}
+  <minValueForColor>k__BackingField:
+  - 0
+  - 0.2
+  - 0.5
+  - 0.7
+  - 0.9
+  - 1
+  - 1.5

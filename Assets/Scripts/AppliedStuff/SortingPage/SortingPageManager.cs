@@ -23,12 +23,15 @@ namespace GreatDevResh.AppliedStuff.SortingPage
         private List<string> groups; // include WITHOUT_GROUP
         private List<bool> isGroupActive;
         private List<bool> isGroupActiveLastTime;
+        private bool asWholeGroups = false;
+        private bool asWholeGroupsLastTime = false;
         private bool isActiveOthers = true;
         private bool isActiveOthersLastTime = true;
         
         private int localGroupUpdateVersion = -1;
 
         private const string OTHER_GROUPS = "Other groups";
+        private const string WHOLE_GROUPS = "As a whole group";
         
         public void UpdateList()
         {
@@ -38,7 +41,7 @@ namespace GreatDevResh.AppliedStuff.SortingPage
                 UpdateListOfGroups();
             }
 
-            while (items.Count < groups.Count() + 1)
+            while (items.Count < groups.Count() + 2)
             {
                 items.Add(Instantiate(SortItemPrefab, contentTransform));
                 items[^1].SetManager(this, items.Count - 1);
@@ -47,15 +50,13 @@ namespace GreatDevResh.AppliedStuff.SortingPage
             int ind = 0;
             while (ind < groups.Count)
             {
-                items[ind].gameObject.SetActive(true);
-                items[ind].SetTitle(groups[ind]);
-                items[ind].SetCheckMark(isGroupActive[ind]);
+                items[ind].Load(groups[ind], isGroupActive[ind]);
                 ind++;
             }
-            items[ind].gameObject.SetActive(true);
-            items[ind].SetTitle(OTHER_GROUPS);
-            items[ind].SetCheckMark(isActiveOthers);
-            ind++;
+            // others
+            items[ind++].Load(OTHER_GROUPS, isActiveOthers);
+            // as whole groups
+            items[ind++].Load(WHOLE_GROUPS, asWholeGroups, true);
             while (ind < items.Count)
             {
                 items[ind].gameObject.SetActive(false);
@@ -109,8 +110,10 @@ namespace GreatDevResh.AppliedStuff.SortingPage
         {
             if (ind < isGroupActive.Count)
                 isGroupActive[ind] = value;
-            else
+            else if (ind == isGroupActive.Count)
                 isActiveOthers = value;
+            else
+                asWholeGroups = value;
         }
 
         private List<string> elseGroups;
@@ -118,18 +121,18 @@ namespace GreatDevResh.AppliedStuff.SortingPage
         {
             isGroupActiveLastTime = new List<bool>(isGroupActive);
             isActiveOthersLastTime = isActiveOthers;
+            asWholeGroupsLastTime = asWholeGroups;
             
             elseGroups = new List<string>();
             for (int i = 0; i < groups.Count(); ++i)
             {
                 if (isGroupActive[i] != isActiveOthers)
                 {
-                    print(groups[i]);
                     elseGroups.Add(groups[i]);
                 }
             }
-            TableWeekManager.SetNewSorting(in isActiveOthers, in elseGroups);
-            TableThreeDays.SetNewSorting(in isActiveOthers, in elseGroups);
+            TableWeekManager.SetNewSorting(in isActiveOthers, in elseGroups, asWholeGroups);
+            TableThreeDays.SetNewSorting(in isActiveOthers, in elseGroups, asWholeGroups);
             HorizontalWeekManager.SetNewSorting(in isActiveOthers, in elseGroups);
 
             if (elseGroups.Count == 1 && !isActiveOthers)
@@ -151,6 +154,7 @@ namespace GreatDevResh.AppliedStuff.SortingPage
             }
 
             isActiveOthers = isActiveOthersLastTime;
+            asWholeGroups = asWholeGroupsLastTime;
             items[groups.Count].SetCheckMark(isActiveOthers);
         }
     }

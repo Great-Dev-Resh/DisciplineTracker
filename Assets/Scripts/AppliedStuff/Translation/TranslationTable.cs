@@ -2,7 +2,7 @@
 
 namespace GreatDevResh.AppliedStuff.Translation
 {
-    [CreateAssetMenu(fileName = "TranslationTable", menuName = "TranslationTable", order = 0)]
+    [CreateAssetMenu(fileName = "TranslationTable", menuName = "Data/TranslationTable", order = 0)]
     public class TranslationTable : ScriptableObject
     {
         public static TranslationTable Instance;

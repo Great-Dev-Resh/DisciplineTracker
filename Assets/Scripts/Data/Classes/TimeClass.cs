@@ -18,7 +18,10 @@ namespace GreatDevResh.Data
 
         public override string ToString()
         {
-            return (minutes / 60) + ":" + (minutes % 60);
+            string minutesStr = (minutes % 60).ToString();
+            if (minutesStr.Length <= 1)
+                minutesStr = "0" + minutesStr;
+            return (minutes / 60) + ":" + minutesStr;
         }
 
         public TimeClass(string str, ref int ind)

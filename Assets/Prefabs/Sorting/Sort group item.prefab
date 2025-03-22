@@ -198,6 +198,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   TitleText: {fileID: 1998505502599309443}
   CheckMarkImage: {fileID: 47562735199266019}
+  BodyImage: {fileID: 2403000294389454713}
+  normalColor: {r: 0.72156864, g: 0.78431374, b: 0.84313726, a: 1}
+  asWholeGroups: {r: 0.74902946, g: 0.72156864, b: 0.84313726, a: 1}
 --- !u!1 &7095487784576561691
 GameObject:
   m_ObjectHideFlags: 0
