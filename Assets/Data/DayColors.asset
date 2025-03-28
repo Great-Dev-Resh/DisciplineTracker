@@ -9,7 +9,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a7cea42e898f4806ba2e80969b1869f1, type: 3}
+  m_Script: {fileID: 11500000, guid: fef03e2bece1449ab90ffb24603c588e, type: 3}
   m_Name: DayColors
   m_EditorClassIdentifier: 
   <defaultColor>k__BackingField: {r: 0.23921569, g: 0.23921569, b: 0.23921569, a: 1}

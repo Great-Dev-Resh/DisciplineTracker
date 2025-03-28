@@ -15,10 +15,7 @@ namespace GreatDevResh.AppliedStuff.Translation
         private void Start()
         {
             text = GetComponent<TMP_Text>();
-            if (SettingsData.LanguageInd == 1)
-                text.text = TranslationTable.Instance.eng[index];
-            else
-                text.text = TranslationTable.Instance.rus[index];
+            text.text = TranslationTable.GetByInd(index);
         }
     }
 }

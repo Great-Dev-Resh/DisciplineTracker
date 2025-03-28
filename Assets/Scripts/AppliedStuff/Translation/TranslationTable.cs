@@ -1,18 +1,13 @@
 ﻿using GreatDevResh.Data.Classes;
+using GreatDevResh.Data.LocalHelpers;
+using UnityEditor;
 using UnityEngine;
 
 namespace GreatDevResh.AppliedStuff.Translation
 {
     [CreateAssetMenu(fileName = "TranslationTable", menuName = "Data/TranslationTable", order = 0)]
-    public class TranslationTable : ScriptableObject
+    public class TranslationTable : SingletonSO<TranslationTable>
     {
-        public static TranslationTable Instance;
-
-        public TranslationTable()
-        {
-            Instance = this;
-        }
-        
         public string[] rus;
         public string[] eng;
 

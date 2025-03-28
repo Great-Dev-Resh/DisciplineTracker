@@ -42,7 +42,7 @@ namespace GreatDevResh.Data.Statistics_v3
             if (!IsDayCounts(date, Info.now))
                 return;
 
-            int colorInd = Math.Max(DayColors.GetNumberFromRatio(completeness) - 1, -1);
+            int colorInd = Math.Max(DayColorsSS.GetNumberFromRatio(completeness) - 1, -1);
 
             switch (type)
             {

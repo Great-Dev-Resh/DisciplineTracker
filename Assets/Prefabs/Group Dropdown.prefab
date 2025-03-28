@@ -246,7 +246,7 @@ MonoBehaviour:
   m_fontSizeBase: 28
   m_fontWeight: 400
   m_enableAutoSizing: 1
-  m_fontSizeMin: 30
+  m_fontSizeMin: 16
   m_fontSizeMax: 46
   m_fontStyle: 0
   m_HorizontalAlignment: 1
@@ -594,7 +594,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4f9b89d023b14aa88b43de7197ff04a9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  height: 800
+  maxHeight: 1000
+  content: {fileID: 1630825463842727663}
 --- !u!1 &4653545583873003314
 GameObject:
   m_ObjectHideFlags: 0
@@ -857,7 +858,7 @@ MonoBehaviour:
   m_fontSizeBase: 40
   m_fontWeight: 400
   m_enableAutoSizing: 1
-  m_fontSizeMin: 18
+  m_fontSizeMin: 14
   m_fontSizeMax: 56
   m_fontStyle: 0
   m_HorizontalAlignment: 2

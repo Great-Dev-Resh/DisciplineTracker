@@ -51,7 +51,6 @@ namespace GreatDevResh.AppliedStuff.ActivitySettings
             // add copiedActivity to this regime
             GeneralData.Regimes[ind].activities.Add(ConsistencyBaseClass.MakeSame(copiedActivity));
             GeneralData.Save();
-            _goalShower.UpdateList();
             
             // close menu (maybe in btn)
             gameObject.SetActive(false);

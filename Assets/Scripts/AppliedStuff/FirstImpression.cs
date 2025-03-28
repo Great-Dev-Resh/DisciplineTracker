@@ -1,5 +1,7 @@
 ﻿using System;
 using GreatDevResh.AppliedStuff.Translation;
+using GreatDevResh.Data.LocalHelpers;
+using GreatDevResh.Data.Statistics_v3;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -11,6 +13,11 @@ namespace GreatDevResh.AppliedStuff
         [SerializeField] private GameObject[] OnFirstTimeEnable;
 
         [SerializeField] private GameObject RestartDayPage;
+
+        [Header("To load singleton")]
+        [SerializeField] private DayColorsSS _dayColors;
+        [SerializeField] private StatisticsTypeData _statisticsTypeData;
+        [SerializeField] private TranslationTable _translationTable;
 
         private int currentDay;
 

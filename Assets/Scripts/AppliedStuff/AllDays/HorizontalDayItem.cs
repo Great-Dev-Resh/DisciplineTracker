@@ -13,7 +13,6 @@ namespace GreatDevResh.AppliedStuff.AllDays
 
         [SerializeField] private Image ProgressImage;
         [SerializeField] private Image OverloadImage;
-        [SerializeField] private DayColors dayColors;
         // [SerializeField] private Color[] colors;
         [SerializeField] private TMP_Text ProgressText;
         
@@ -30,7 +29,7 @@ namespace GreatDevResh.AppliedStuff.AllDays
         private void SetProgress(Day dayData, in bool sortingDefaultValue, in List<string> sortingGroupElse)
         {
             float ratio = Mathf.Max(dayData.GetRawRatio(in sortingDefaultValue, in sortingGroupElse), 0);
-            Color color = DayColors.RatioToColor(ratio);
+            Color color = DayColorsSS.RatioToColor(ratio);
             
             ProgressImage.color = color;
             ProgressImage.fillAmount = ratio;

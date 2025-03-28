@@ -19,7 +19,6 @@ namespace GreatDevResh.AppliedStuff.AllDays
         [SerializeField] private GameObject[] Blocks;
 
         [SerializeField] private Image[] BatteryImages;
-        [SerializeField] private DayColors dayColors;
         // [SerializeField] private Color[] colors;
         // [SerializeField] private Color inactiveColor;
         // [SerializeField] private Color doneWithoutGoal;
@@ -47,7 +46,7 @@ namespace GreatDevResh.AppliedStuff.AllDays
         private void SetBattery(Day dayData, in bool sortingDefaultValue, in List<string> sortingGroupElse)
         {
             float ratio = dayData.GetRawRatio(in sortingDefaultValue, in sortingGroupElse);
-            Color color = DayColors.RatioToColor(ratio);
+            Color color = DayColorsSS.RatioToColor(ratio);
 
             int ind = 0;
             int cnt = (int)(BatteryImages.Length * ratio + (ratio is > 0.6f and < 0.9f ? 0.41f : (ratio is > 0.6f and < 0.92f ? 0.2f : 0)));
@@ -59,7 +58,7 @@ namespace GreatDevResh.AppliedStuff.AllDays
 
             while (ind < BatteryImages.Length)
             {
-                BatteryImages[ind].color = dayColors.defaultColor;
+                BatteryImages[ind].color = DayColorsSS.Instance.defaultColor;
                 ind++;
             }
         }
@@ -100,7 +99,7 @@ namespace GreatDevResh.AppliedStuff.AllDays
             {
                 if (blockInd >= groups.Count)
                 {
-                    SetBlock(blockInd, "", "", dayColors.defaultColor);
+                    SetBlock(blockInd, "", "", DayColorsSS.Instance.defaultColor);
                 } else if (blockInd == CountOfActivityBlocks - 1)
                 {
                     int ind = groups.Count - 1;
@@ -119,9 +118,9 @@ namespace GreatDevResh.AppliedStuff.AllDays
             if (!done)
                 ratio = Mathf.Min(ratio, 0.99f);
             if (ratio < 1000000) 
-                SetBlock(ind, name, Mathf.FloorToInt(ratio * 100) + "%", DayColors.RatioToColor(ratio));
+                SetBlock(ind, name, Mathf.FloorToInt(ratio * 100) + "%", DayColorsSS.RatioToColor(ratio));
             else
-                SetBlock(ind, name, "---", dayColors.doneWithoutGoal);
+                SetBlock(ind, name, "---", DayColorsSS.Instance.doneWithoutGoal);
         }
 
         private void SetActivities(Day dayData, in bool sortingDefaultValue, in List<string> sortingGroupElse)
@@ -174,11 +173,11 @@ namespace GreatDevResh.AppliedStuff.AllDays
             {
                 Color color;
                 if (activity.CanBeCompleted())
-                    color = DayColors.RatioToColor(activity.GetCompleteness());
+                    color = DayColorsSS.RatioToColor(activity.GetCompleteness());
                 else if (activity.HaveSomeProgress())
-                    color = dayColors.doneWithoutGoal;
+                    color = DayColorsSS.Instance.doneWithoutGoal;
                 else
-                    color = dayColors.defaultColor;
+                    color = DayColorsSS.Instance.defaultColor;
                 SetBlock(ind, activity.Title, activity.GetStringOfCompleteness(), color);
                 ind++;
             }
@@ -186,18 +185,18 @@ namespace GreatDevResh.AppliedStuff.AllDays
             {
                 Color color;
                 if (worst.CanBeCompleted())
-                    color = DayColors.RatioToColor(worst.GetCompleteness());
+                    color = DayColorsSS.RatioToColor(worst.GetCompleteness());
                 else if (worst.HaveSomeProgress())
-                    color = dayColors.doneWithoutGoal;
+                    color = DayColorsSS.Instance.doneWithoutGoal;
                 else
-                    color = dayColors.defaultColor;
+                    color = DayColorsSS.Instance.defaultColor;
                 SetBlock(ind, worst.Title, worst.GetStringOfCompleteness(), color);
                 ind++;
             }
 
             while (ind < CountOfActivityBlocks)
             {
-                SetBlock(ind, "", "", dayColors.defaultColor);
+                SetBlock(ind, "", "", DayColorsSS.Instance.defaultColor);
                 ind++;
             }
         }
