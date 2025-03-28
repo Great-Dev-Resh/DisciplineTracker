@@ -30,7 +30,7 @@ namespace GreatDevResh.AppliedStuff.AllDays
         {
             DateText.text = day + "." + date.Month + "." + date.Year;
             if (dayData is null)
-                dayData = Info.Store[date.Int()].days[day];
+                dayData = Info.Store[date.MonthHash()].days[day];
             if (dayData is null)
                 return;
 
@@ -47,7 +47,7 @@ namespace GreatDevResh.AppliedStuff.AllDays
         private void SetBattery(Day dayData, in bool sortingDefaultValue, in List<string> sortingGroupElse)
         {
             float ratio = dayData.GetRawRatio(in sortingDefaultValue, in sortingGroupElse);
-            Color color = dayColors.RatioToColor(ratio);
+            Color color = DayColors.RatioToColor(ratio);
 
             int ind = 0;
             int cnt = (int)(BatteryImages.Length * ratio + (ratio is > 0.6f and < 0.9f ? 0.41f : (ratio is > 0.6f and < 0.92f ? 0.2f : 0)));
@@ -119,7 +119,7 @@ namespace GreatDevResh.AppliedStuff.AllDays
             if (!done)
                 ratio = Mathf.Min(ratio, 0.99f);
             if (ratio < 1000000) 
-                SetBlock(ind, name, Mathf.FloorToInt(ratio * 100) + "%", dayColors.RatioToColor(ratio));
+                SetBlock(ind, name, Mathf.FloorToInt(ratio * 100) + "%", DayColors.RatioToColor(ratio));
             else
                 SetBlock(ind, name, "---", dayColors.doneWithoutGoal);
         }
@@ -174,7 +174,7 @@ namespace GreatDevResh.AppliedStuff.AllDays
             {
                 Color color;
                 if (activity.CanBeCompleted())
-                    color = dayColors.RatioToColor(activity.GetCompleteness());
+                    color = DayColors.RatioToColor(activity.GetCompleteness());
                 else if (activity.HaveSomeProgress())
                     color = dayColors.doneWithoutGoal;
                 else
@@ -186,7 +186,7 @@ namespace GreatDevResh.AppliedStuff.AllDays
             {
                 Color color;
                 if (worst.CanBeCompleted())
-                    color = dayColors.RatioToColor(worst.GetCompleteness());
+                    color = DayColors.RatioToColor(worst.GetCompleteness());
                 else if (worst.HaveSomeProgress())
                     color = dayColors.doneWithoutGoal;
                 else

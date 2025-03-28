@@ -135,7 +135,7 @@ public class TodayController : MonoBehaviour // LEGACY
     {
         Info.Init();
 
-        today = Info.Store[Info.now.Int()].days[DateController.Day];
+        today = Info.Store[Info.now.MonthHash()].days[DateController.Day];
         if (today is null)
         {
             Debug.LogErrorFormat("today missing!");

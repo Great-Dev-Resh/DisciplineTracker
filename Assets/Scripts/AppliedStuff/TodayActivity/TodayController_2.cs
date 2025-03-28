@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using GreatDevResh.Data;
 using GreatDevResh.Data.Classes;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace GreatDevResh.AppliedStuff.TodayActivity
 {
@@ -15,6 +16,8 @@ namespace GreatDevResh.AppliedStuff.TodayActivity
         [SerializeField] private TodayCheckBoxItem checkBoxPrefab;
 
         [SerializeField] private Transform Content;
+
+        [FormerlySerializedAs("MessageEmpty")] [SerializeField] private GameObject messageEmpty;
         
         private Day today;
 
@@ -23,6 +26,8 @@ namespace GreatDevResh.AppliedStuff.TodayActivity
         private List<TodayCheckBoxItem> checkBoxItems;
 
         private int regimeUpdateVersion = -1;
+        private string chosenGroup = "";
+        private bool _onlyNotDone = false;
 
         public void UpdateList()
         {
@@ -31,6 +36,11 @@ namespace GreatDevResh.AppliedStuff.TodayActivity
             int checkBoxInd = 0;
             foreach (var activity in today.activities)
             {
+                if (chosenGroup != "" && chosenGroup != activity.group)
+                    continue;
+                if (_onlyNotDone && (!activity.CanBeCompleted() || activity.GetCompleteness() >= 1f))
+                    continue;
+                
                 if (activity is AmountClass amountClass)
                 {
                     if (amountInd >= amountItems.Count)
@@ -75,6 +85,8 @@ namespace GreatDevResh.AppliedStuff.TodayActivity
                     scheduleInd++;
                 }
             }
+            
+            messageEmpty.SetActive(amountInd == 0 && scheduleInd == 0 && checkBoxInd == 0);
 
             while (amountInd < amountItems.Count)
             {
@@ -128,6 +140,21 @@ namespace GreatDevResh.AppliedStuff.TodayActivity
             RegimeDropDown.SetSelectedItem(ind);
         }
 
+        public void SelectGroup(string group)
+        {
+            if (group == GroupDropDown.Only_Not_Done)
+            {
+                chosenGroup = "";
+                _onlyNotDone = true;
+            }
+            else
+            {
+                chosenGroup = group;
+                _onlyNotDone = false;
+            }
+            UpdateList();
+        }
+
         private void Awake()
         {
             Info.Init();
@@ -136,7 +163,7 @@ namespace GreatDevResh.AppliedStuff.TodayActivity
             scheduleItems = new List<TodayScheduleItem>();
             checkBoxItems = new List<TodayCheckBoxItem>();
             
-            today = Info.Store[Info.now.Int()].days[DateController.Day];
+            today = Info.Store[Info.now.MonthHash()].days[DateController.Day];
 
             SetCurrentRegime();
             UpdateList();

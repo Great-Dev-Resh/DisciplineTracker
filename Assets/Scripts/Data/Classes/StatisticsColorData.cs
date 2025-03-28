@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using GreatDevResh.MultiUseful;
 using UnityEngine;
 
@@ -6,17 +7,17 @@ namespace GreatDevResh.Data.Classes
 {
     public class StatisticsColorData
     {
-        public List<int> data;
+        public List<long> data;
 
         public StatisticsColorData()
         {
-            data = new List<int>();
+            data = new List<long>();
         }
 
         public StatisticsColorData(string str, ref int ind)
         {
             ind++;
-            data = new List<int>();
+            data = new List<long>();
             while (str[ind] != '}')
             {
                 data.Add(StringHelper.GetNumber(str, ref ind, ','));
@@ -25,7 +26,12 @@ namespace GreatDevResh.Data.Classes
             ind++;
         }
 
-        public int GetAt(int ind)
+        public StatisticsColorData(StatisticsColorData other)
+        {
+            data = new List<long>(other.data);
+        }
+
+        public long GetAt(int ind)
         {
             MakeSureThatLenghtEnough(ind);
             return data[ind];
@@ -42,7 +48,7 @@ namespace GreatDevResh.Data.Classes
         public void Reduce(int ind)
         {
             if (data.Count > ind)
-                data[ind] = Mathf.Max(0, data[ind] - 1);
+                data[ind] = Math.Max(0, data[ind] - 1);
         }
         
         public void AddTo(int ind)
@@ -77,7 +83,7 @@ namespace GreatDevResh.Data.Classes
             MakeSureThatLenghtEnough(other.data.Count - 1);
             for (int i = 0; i < other.data.Count; ++i)
             {
-                data[i] = Mathf.Max(data[i], other.data[i]);
+                data[i] = Math.Max(data[i], other.data[i]);
             }
         }
 

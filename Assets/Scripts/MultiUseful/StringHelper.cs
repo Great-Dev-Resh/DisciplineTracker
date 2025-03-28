@@ -8,7 +8,12 @@ namespace GreatDevResh.MultiUseful
     {
         public static int GetNumber(string str, ref int ind, char stopChar, bool EatStopChar = true)
         {
-            int res = 0, sign = 1;
+            return (int)GetLong(str, ref ind, stopChar, EatStopChar);
+        }
+        
+        public static long GetLong(string str, ref int ind, char stopChar, bool EatStopChar = true)
+        {
+            long res = 0, sign = 1;
             if (str[ind] == '-' && stopChar != '-')
             {
                 sign = -1;
@@ -19,6 +24,15 @@ namespace GreatDevResh.MultiUseful
             if (EatStopChar)
                 ind++;
             return res * sign;
+        }
+
+        public static double GetDouble(string str, ref int ind, char stopChar, bool EatStopChar = true)
+        {
+            double integer = GetLong(str, ref ind, ',');
+            double dec = GetLong(str, ref ind, stopChar, EatStopChar);
+            while (dec >= 1)
+                dec /= 10;
+            return integer + dec;
         }
 
         public static string GetString(string str, ref int ind, int cnt)

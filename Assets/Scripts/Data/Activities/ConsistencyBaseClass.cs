@@ -22,6 +22,7 @@ namespace GreatDevResh.Data
         }
 
         public virtual float GetCompleteness() => 1;
+        public virtual long GetAmount() => 0; // overrided only is amountActivity
 
         public virtual bool CanBeCompleted() => true;
 

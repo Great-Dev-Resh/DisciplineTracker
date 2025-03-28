@@ -10,8 +10,6 @@ namespace GreatDevResh.AppliedStuff
         [SerializeField] private GameObject[] OnFirstTimeDisable;
         [SerializeField] private GameObject[] OnFirstTimeEnable;
 
-        [SerializeField] private TranslationTable translationTable;
-
         [SerializeField] private GameObject RestartDayPage;
 
         private int currentDay;
@@ -29,17 +27,16 @@ namespace GreatDevResh.AppliedStuff
             }
 
             currentDay = DateController.Day;
-            TranslationTable.Instance = translationTable;
         }
         
         private void Update()
         {
             if (DateController.Day != currentDay)
             {
-                MyDate nextMonth = new MyDate(ref Info.now);
+                MyDate nextMonth = new MyDate(Info.now);
                 nextMonth.Month++;
                 if (DateController.Day > 1 && currentDay + 1 == DateController.Day || 
-                    DateController.Day == Info.now.AmountOfDays() && DateController.Day == 1 &&
+                    DateController.Day == Info.now.DaysInMonth() && DateController.Day == 1 &&
                     DateController.Month == nextMonth.Month && DateController.Year == nextMonth.Year)
                 {
                     currentDay = DateController.Day;

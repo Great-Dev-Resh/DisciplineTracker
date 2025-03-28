@@ -37,8 +37,8 @@ namespace GreatDevResh.AppliedStuff.Settings
             DayExample7.SetCountOfBlocks(SettingsData.CntActivitiesIn7Days);
             DayExample4.SetCountOfBlocks(SettingsData.CntActivitiesIn4Days);
             
-            DayExample7.Init(new MyDate(2025, 1), 1, true, new List<string>(), false, TestDay);
-            DayExample4.Init(new MyDate(2025, 1), 1, true, new List<string>(), false, TestDay);
+            DayExample7.Init(new MyDate(2025, 1, 1), 1, true, new List<string>(), false, TestDay);
+            DayExample4.Init(new MyDate(2025, 1, 1), 1, true, new List<string>(), false, TestDay);
         }
 
         private void Init()

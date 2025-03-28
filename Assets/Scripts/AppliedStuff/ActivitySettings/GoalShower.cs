@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using GreatDevResh.AppliedStuff.ActivitySettings;
 using GreatDevResh.Data;
 using GreatDevResh.Data.Classes;
 using GreatDevResh.Data.Regimes;
@@ -15,6 +16,7 @@ namespace GreatDevResh.AppliedStuff
         [SerializeField] private GoalCheckBoxItem checkBoxPrefab;
         [SerializeField] private Transform content;
         [SerializeField] private GameObject DeleteWarningPage;
+        [SerializeField] private RegimeCopingMenu _regimeCopingMenu;
 
         private int currentRegimeIndex = 0;
         
@@ -159,6 +161,11 @@ namespace GreatDevResh.AppliedStuff
         {
             currentRegimeIndex = value;
             UpdateList();
+        }
+        
+        public void StartCopingActivity(int activityInd)
+        {
+            _regimeCopingMenu.Open(activityInd, currentRegimeIndex);
         }
     }
 }

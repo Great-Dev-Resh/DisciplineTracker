@@ -1460,7 +1460,7 @@ MonoBehaviour:
   m_enableKerning: 1
   m_enableExtraPadding: 0
   checkPaddingRequired: 0
-  m_isRichText: 1
+  m_isRichText: 0
   m_parseCtrlCharacters: 1
   m_isOrthographic: 1
   m_isCullingEnabled: 0
@@ -1604,11 +1604,11 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 90889772916726999, guid: e7b50db1adb91bc42ad142c14850e57d, type: 3}
       propertyPath: m_fontSize
-      value: 18
+      value: 17.9
       objectReference: {fileID: 0}
     - target: {fileID: 442976171463459198, guid: e7b50db1adb91bc42ad142c14850e57d, type: 3}
       propertyPath: m_fontSize
-      value: 18
+      value: 17.9
       objectReference: {fileID: 0}
     - target: {fileID: 1233339472165825985, guid: e7b50db1adb91bc42ad142c14850e57d, type: 3}
       propertyPath: m_Pivot.x
@@ -1800,11 +1800,11 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 90889772916726999, guid: e7b50db1adb91bc42ad142c14850e57d, type: 3}
       propertyPath: m_fontSize
-      value: 18
+      value: 17.9
       objectReference: {fileID: 0}
     - target: {fileID: 442976171463459198, guid: e7b50db1adb91bc42ad142c14850e57d, type: 3}
       propertyPath: m_fontSize
-      value: 18
+      value: 17.9
       objectReference: {fileID: 0}
     - target: {fileID: 1233339472165825985, guid: e7b50db1adb91bc42ad142c14850e57d, type: 3}
       propertyPath: m_Pivot.x
@@ -1996,11 +1996,11 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 90889772916726999, guid: e7b50db1adb91bc42ad142c14850e57d, type: 3}
       propertyPath: m_fontSize
-      value: 18
+      value: 17.9
       objectReference: {fileID: 0}
     - target: {fileID: 442976171463459198, guid: e7b50db1adb91bc42ad142c14850e57d, type: 3}
       propertyPath: m_fontSize
-      value: 18
+      value: 17.9
       objectReference: {fileID: 0}
     - target: {fileID: 1233339472165825985, guid: e7b50db1adb91bc42ad142c14850e57d, type: 3}
       propertyPath: m_Pivot.x
@@ -2192,11 +2192,11 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 90889772916726999, guid: e7b50db1adb91bc42ad142c14850e57d, type: 3}
       propertyPath: m_fontSize
-      value: 18
+      value: 17.9
       objectReference: {fileID: 0}
     - target: {fileID: 442976171463459198, guid: e7b50db1adb91bc42ad142c14850e57d, type: 3}
       propertyPath: m_fontSize
-      value: 18
+      value: 17.9
       objectReference: {fileID: 0}
     - target: {fileID: 1233339472165825985, guid: e7b50db1adb91bc42ad142c14850e57d, type: 3}
       propertyPath: m_Pivot.x

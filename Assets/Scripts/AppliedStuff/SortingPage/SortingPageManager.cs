@@ -1,6 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using GreatDevResh.AppliedStuff.AllDays;
+using GreatDevResh.AppliedStuff.Translation;
 using GreatDevResh.Data.Classes;
 using TMPro;
 using UnityEngine;
@@ -30,8 +32,18 @@ namespace GreatDevResh.AppliedStuff.SortingPage
         
         private int localGroupUpdateVersion = -1;
 
-        private const string OTHER_GROUPS = "Other groups";
-        private const string WHOLE_GROUPS = "As a whole group";
+        private static string OTHER_GROUPS = "Other groups";
+        private static string WHOLE_GROUPS = "";
+        private static string ALL_GROUPS;
+        private static string MIXED_GROUPS;
+        private static string NOTHING;
+
+        [Header("Translation")] 
+        [SerializeField] private int Other_group_ind;
+        [SerializeField] private int Whole_groups_ind;
+        [SerializeField] private int All_groups_ind;
+        [SerializeField] private int Mixed_groups_ind;
+        [SerializeField] private int Nothing_ing;
         
         public void UpdateList()
         {
@@ -39,6 +51,7 @@ namespace GreatDevResh.AppliedStuff.SortingPage
             {
                 localGroupUpdateVersion = GeneralData.GroupUpdateVersion;
                 UpdateListOfGroups();
+                ApplyTranslation();
             }
 
             while (items.Count < groups.Count() + 2)
@@ -138,11 +151,11 @@ namespace GreatDevResh.AppliedStuff.SortingPage
             if (elseGroups.Count == 1 && !isActiveOthers)
                 BTN_SortText.text = elseGroups[0];
             else if (elseGroups.Count >= 1)
-                BTN_SortText.text = "Mixed groups";
+                BTN_SortText.text = MIXED_GROUPS;
             else if (isActiveOthers)
-                BTN_SortText.text = "All groups";
+                BTN_SortText.text = ALL_GROUPS;
             else
-                BTN_SortText.text = "Nothing";
+                BTN_SortText.text = NOTHING;
         }
 
         public void Cancel()
@@ -156,6 +169,32 @@ namespace GreatDevResh.AppliedStuff.SortingPage
             isActiveOthers = isActiveOthersLastTime;
             asWholeGroups = asWholeGroupsLastTime;
             items[groups.Count].SetCheckMark(isActiveOthers);
+        }
+
+        private void Awake()
+        {
+            ApplyTranslation();
+            
+            // BTN_SortText.text = ALL_GROUPS;
+        }
+
+        private bool isTranslated = false;
+        private void ApplyTranslation()
+        {
+            if (isTranslated)
+                return;
+            isTranslated = true;
+            
+            OTHER_GROUPS = TranslationTable.GetByInd(Other_group_ind);
+            WHOLE_GROUPS = TranslationTable.GetByInd(Whole_groups_ind);
+            ALL_GROUPS = TranslationTable.GetByInd(All_groups_ind);
+            MIXED_GROUPS = TranslationTable.GetByInd(Mixed_groups_ind);
+            NOTHING = TranslationTable.GetByInd(Nothing_ing);
+        }
+        
+        private void OnDestroy() // when scene is reloading
+        {
+            isTranslated = false;
         }
     }
 }

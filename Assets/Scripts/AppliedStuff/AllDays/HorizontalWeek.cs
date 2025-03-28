@@ -25,7 +25,7 @@ namespace GreatDevResh.AppliedStuff.AllDays
             while (startDay < 1)
             {
                 date.Month--;
-                startDay += date.AmountOfDays();
+                startDay += date.DaysInMonth();
             }
             
             Info.CheckForDate(date);
@@ -33,14 +33,14 @@ namespace GreatDevResh.AppliedStuff.AllDays
             int emptiesAmount = 0, dots = 0;
             for (int i = 0; i < DaysInWeek; ++i)
             {
-                while (startDay > date.AmountOfDays())
+                while (startDay > date.DaysInMonth())
                 {
-                    startDay -= date.AmountOfDays();
+                    startDay -= date.DaysInMonth();
                     date.Month++;
                     Info.CheckForDate(date);
                 }
             
-                if (!Info.Store.ContainsKey(date.Int()) || Info.Store[date.Int()] is null || Info.Store[date.Int()].days[startDay] is null ||
+                if (!Info.Store.ContainsKey(date.MonthHash()) || Info.Store[date.MonthHash()] is null || Info.Store[date.MonthHash()].days[startDay] is null ||
                     date > Info.now || date == Info.now && startDay > DateController.Day)
                 {
                     if (date > Info.now || date == Info.now && startDay > DateController.Day)
@@ -71,7 +71,7 @@ namespace GreatDevResh.AppliedStuff.AllDays
                 {
                     items[i - emptiesAmount].gameObject.SetActive(true);
                     items[i - emptiesAmount].transform.SetSiblingIndex(i);
-                    items[i - emptiesAmount].Init(new MyDate(ref date), startDay, in sortingDefaultValue, in sortingGroupsElse);
+                    items[i - emptiesAmount].Init(new MyDate(date), startDay, in sortingDefaultValue, in sortingGroupsElse);
                 }
             
                 startDay++;

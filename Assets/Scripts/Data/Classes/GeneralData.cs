@@ -10,7 +10,6 @@ namespace GreatDevResh.Data.Classes
     public static class GeneralData
     {
         public static MyDate startDate;
-        public static int startDay;
 
         public static List<RegimeClass> Regimes;
         public static List<string> GroupNames;
@@ -40,10 +39,10 @@ namespace GreatDevResh.Data.Classes
         private static void CreateFromString(string str, ref int ind)
         {
             ind++;
-            startDay = StringHelper.GetNumber(str, ref ind, ',');
+            int day = StringHelper.GetNumber(str, ref ind, ',');
             int month = StringHelper.GetNumber(str, ref ind, ',');
             int year = StringHelper.GetNumber(str, ref ind, '\n');
-            startDate = new MyDate(year, month);
+            startDate = new MyDate(year, month, day);
 
             Regimes = StringHelper.GetList<RegimeClass>(str, ref ind);
             ind += 2;
@@ -64,7 +63,7 @@ namespace GreatDevResh.Data.Classes
         
         public static string ToString()
         {
-            string res = "{" + startDay + "," + startDate.Month + "," + startDate.Year + "\n";
+            string res = "{" + startDate.Day + "," + startDate.Month + "," + startDate.Year + "\n";
             res += StringHelper.PackList(ref Regimes);
             res += "\n{";
             foreach (var group in GroupNames)

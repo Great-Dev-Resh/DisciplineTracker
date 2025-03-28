@@ -23,7 +23,7 @@ public class SetTable : MonoBehaviour // LEGACY
         _gridLayoutGroup = GetComponent<GridLayoutGroup>();
         rectTransform = GetComponent<RectTransform>();
 
-        lastNotAddedMonth = new MyDate(ref Info.now);
+        lastNotAddedMonth = new MyDate(Info.now);
 
         int day = DateController.Day;
         int weekDay = DateController.DayOfWeek;
@@ -33,16 +33,16 @@ public class SetTable : MonoBehaviour // LEGACY
             Instantiate(_emptyPrefab, transform);
         }
 
-        for (int i = day; i > 0 && (lastNotAddedMonth > GeneralData.startDate || i >= GeneralData.startDay); --i)
+        for (int i = day; i > 0 && (lastNotAddedMonth > GeneralData.startDate || i >= GeneralData.startDate.Day); --i)
         {
             var newday = Instantiate(_dayPrefab, transform);
-            if (Info.Store[lastNotAddedMonth.Int()].days[i] is null)
+            if (Info.Store[lastNotAddedMonth.MonthHash()].days[i] is null)
             {
-                Info.Store[lastNotAddedMonth.Int()].days[i] = new Day();
+                Info.Store[lastNotAddedMonth.MonthHash()].days[i] = new Day();
             }
             
             newday.Init(lastNotAddedMonth, i, 
-                Info.Store[lastNotAddedMonth.Int()].days[i], Info.TryGetPreviousDay(lastNotAddedMonth, i));
+                Info.Store[lastNotAddedMonth.MonthHash()].days[i], Info.TryGetPreviousDay(lastNotAddedMonth, i));
             if (i == day)
                 currentDay = newday;
         }
@@ -92,18 +92,18 @@ public class SetTable : MonoBehaviour // LEGACY
             return;
         
         Info.LoadLastMonth(lastNotAddedMonth);
-        if (!Info.Store.ContainsKey(lastNotAddedMonth.Int()) || Info.Store[lastNotAddedMonth.Int()] is null)
+        if (!Info.Store.ContainsKey(lastNotAddedMonth.MonthHash()) || Info.Store[lastNotAddedMonth.MonthHash()] is null)
         {
             Info.CheckForDate(lastNotAddedMonth);
         }
-        for (int i = lastNotAddedMonth.AmountOfDays(); i >= 1; --i)
+        for (int i = lastNotAddedMonth.DaysInMonth(); i >= 1; --i)
         {
-            if (lastNotAddedMonth.Int() == GeneralData.startDate.Int() &&
-                i < GeneralData.startDay)
+            if (lastNotAddedMonth.MonthHash() == GeneralData.startDate.MonthHash() &&
+                i < GeneralData.startDate.Day)
                 break;
             
             var newday = Instantiate(_dayPrefab, transform);
-            newday.Init(lastNotAddedMonth, i, Info.Store[lastNotAddedMonth.Int()].days[i],
+            newday.Init(lastNotAddedMonth, i, Info.Store[lastNotAddedMonth.MonthHash()].days[i],
                 Info.TryGetPreviousDay(lastNotAddedMonth, i));
         }
         

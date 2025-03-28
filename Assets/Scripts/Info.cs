@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using GreatDevResh.Data;
 using GreatDevResh.Data.Classes;
+using GreatDevResh.Data.Statistics_v3;
 using GreatDevResh.MultiUseful;
 using UnityEngine;
 using UnityEngine.Serialization;
@@ -18,40 +19,40 @@ public static class Info
     private static bool _isInit = false;
 
     public static Day TodayDayData =>
-        Store[now.Int()] is not null && Store[now.Int()].days[DateController.Day] is not null
-            ? Store[now.Int()].days[DateController.Day]
+        Store[now.MonthHash()] is not null && Store[now.MonthHash()].days[DateController.Day] is not null
+            ? Store[now.MonthHash()].days[DateController.Day]
             : null;
 
     public static void SaveToday() => SaveDay(now);
 
     public static void SaveDay(MyDate date)
     {
-        if (!Store.ContainsKey(date.Int()) || Store[date.Int()] is null)
+        if (!Store.ContainsKey(date.MonthHash()) || Store[date.MonthHash()] is null)
             return;
         
-        string str = Store[date.Int()].To_string();
-        FileDataHandler.Save(date.To_String(), str);
+        string str = Store[date.MonthHash()].To_string();
+        FileDataHandler.Save(date.StringMonthHash(), str);
     }
 
     public static bool LoadMonth(MyDate _date)
     {
-        MyDate date = new MyDate(ref _date);
+        MyDate date = new MyDate(_date);
         if (date < GeneralData.startDate)
             return false;
         
         //Debug.Log("Reading: " + date.Int());
-        string str = FileDataHandler.Load(date.To_String());
+        string str = FileDataHandler.Load(date.StringMonthHash());
         if (str is null or "")
             return false;
         
-        Store[date.Int()] = new MonthData(str);
+        Store[date.MonthHash()] = new MonthData(str);
         //Debug.Log("Creating: " + date.Int());
         return true;
     }
 
     public static MyDate LoadLastMonth(MyDate _date)
     {
-        var date = new MyDate(ref _date);
+        var date = new MyDate(_date);
         if (date < GeneralData.startDate)
             return null;
 
@@ -74,15 +75,15 @@ public static class Info
         FileDataHandler.SetPath(Application.persistentDataPath);
         Store = new Dictionary<int, MonthData>();
         
-        now = new MyDate(DateController.Year, DateController.Month);
+        now = new MyDate(DateController.Year, DateController.Month, DateController.Day);
         GetGeneralData();
 
         CheckForDate(now);
-
+        
         StatisticsData.LoadData();
-        if (Store[now.Int()].days[DateController.Day] is null)
+        if (Store[now.MonthHash()].days[DateController.Day] is null)
         {
-            Store[now.Int()].days[DateController.Day] = new Day(GeneralData.Regimes[GeneralData.DefaultRegime]);
+            Store[now.MonthHash()].days[DateController.Day] = new Day(GeneralData.Regimes[GeneralData.DefaultRegime]);
             SaveToday();
             // StatisticsData.AddDay(now, DateController.Day);
             StatisticsData.RecalculateAll(); // TODO: optimize this
@@ -103,11 +104,7 @@ public static class Info
         if (!GeneralData.IsCreated)
         {
             GeneralData.CreateNew();
-            GeneralData.startDate = new MyDate(now.Year, now.Month);
-            // generalData.startDate.Month -= 3;
-            GeneralData.startDay = DateController.Day;
-            // generalData.day -= 1;
-            
+            GeneralData.startDate = new MyDate(now);
             GeneralData.Save();
 
             IsFirstStart = true;
@@ -116,82 +113,45 @@ public static class Info
 
     public static void CheckForDate(MyDate date)
     {
-        if (GeneralData.startDate > date || (Store.ContainsKey(date.Int()) && Store[date.Int()] is not null))
+        if (GeneralData.startDate > date || (Store.ContainsKey(date.MonthHash()) && Store[date.MonthHash()] is not null))
             return;
         LoadMonth(date);
-        if (Store.ContainsKey(date.Int()) && Store[date.Int()] is not null)
+        if (Store.ContainsKey(date.MonthHash()) && Store[date.MonthHash()] is not null)
         {
             if (date == now)
             {
-                for (int i = DateController.Day + 1; i <= now.AmountOfDays(); ++i)
-                    Store[now.Int()].days[i] = null;
+                for (int i = DateController.Day + 1; i <= now.DaysInMonth(); ++i)
+                    Store[now.MonthHash()].days[i] = null;
             }
             return;
         }
 
-        Store[date.Int()] = new MonthData();
+        Store[date.MonthHash()] = new MonthData();
         SaveDay(date);
-    }
-
-    public static Colors GetLastMonthColors()
-    {
-        Colors lastMonthColors = new Colors();
-
-        for (int i = DateController.Day - 1; i > 0 && (GeneralData.startDate.Int() != now.Int() || i >= GeneralData.startDay); --i)
-        {
-            if (Store[now.Int()].days[i] is null)
-                continue;
-            int cur = Store[now.Int()].days[i].GetNumberOfRatio();
-            for (int j = 1; j <= cur; ++j)
-                lastMonthColors.c[j]++;
-        }
-        
-        MyDate lastMonthDate = new MyDate(now.Year, now.Month);
-        lastMonthDate.Month--;
-        for (int i = lastMonthDate.AmountOfDays();
-             i >= DateController.Day && (GeneralData.startDate < lastMonthDate || 
-                                         GeneralData.startDate.Int() == lastMonthDate.Int() && i >= GeneralData.startDay); --i)
-        {
-            if (Store[lastMonthDate.Int()].days[i] is null)
-                continue;
-            int cur = Store[lastMonthDate.Int()].days[i].GetNumberOfRatio();
-            for (int j = 1; j <= cur; ++j)
-                lastMonthColors.c[j]++;
-        }
-
-        return lastMonthColors;
     }
 
     public static Day TryGetPreviousDay(MyDate _date, int day)
     {
-        if (_date.Int() == GeneralData.startDate.Int() && day <= GeneralData.startDay)
+        if (_date.MonthHash() == GeneralData.startDate.MonthHash() && day <= GeneralData.startDate.Day)
             return null;
 
-        MyDate date = new MyDate(ref _date);
+        MyDate date = new MyDate(_date);
         if (day <= 1)
         {
             date.Month--;
-            day = date.AmountOfDays();
+            day = date.DaysInMonth();
         }
         else
         {
             day--;
         }
         
-        if (!Store.ContainsKey(date.Int()))
+        if (!Store.ContainsKey(date.MonthHash()))
             LoadLastMonth(date);
-        if (!Store.ContainsKey(date.Int()))
+        if (!Store.ContainsKey(date.MonthHash()))
             return null;
-        return Store[date.Int()].days[day];
+        return Store[date.MonthHash()].days[day];
     }
-
-    // [ContextMenu("Clear General Data")]
-    // public void ClearGeneralData()
-    // {
-    //     PlayerPrefs.DeleteKey("GeneralData");
-    //     PlayerPrefs.DeleteKey("GoalsData");
-    //     PlayerPrefs.DeleteKey("MotivationHelper");
-    // }
 }
 
 [Serializable]
@@ -199,10 +159,11 @@ public class MyDate
 {
     public int Year;
 
-    [SerializeField]
-    private int _month;
+    [SerializeField] private int _month;
 
-    public int Month
+    [SerializeField] private int _day;
+
+    public int Month // it's possible, that changing months day can become incorrect
     {
         get => _month;
         set
@@ -222,19 +183,56 @@ public class MyDate
         }
     }
 
+    public int Day
+    {
+        get => _day;
+        set
+        {
+            _day = value;
+            while (_day < 1)
+            {
+                --Month;
+                _day += DaysInMonth();
+            }
+
+            while (_day > DaysInMonth())
+            {
+                _day -= DaysInMonth();
+                ++Month;
+            }
+        }
+    }
+
     public MyDate(int year, int month)
     {
         Year = year;
         Month = month;
+        Day = 1;
+    }
+    
+    public MyDate(int year, int month, int day)
+    {
+        Year = year;
+        Month = month;
+        Day = day;
     }
 
-    public MyDate(ref MyDate myDate)
+    public MyDate(MyDate myDate)
     {
         Year = myDate.Year;
         Month = myDate.Month;
+        Day = myDate.Day;
+    }
+
+    public MyDate(string str, ref int ind)
+    {
+        ind++;
+        _month = StringHelper.GetNumber(str, ref ind, '-');
+        _day = StringHelper.GetNumber(str, ref ind, '-');
+        Year = StringHelper.GetNumber(str, ref ind, ')');
     }
     
-    public int Int()
+    public int MonthHash()
     {
         return Year * 1000 + Month;
     }
@@ -269,21 +267,37 @@ public class MyDate
         return !(x == y);
     }
 
-    public string To_String()
+    public string StringMonthHash()
     {
         return "Data of " + Month + "-" + Year;
     }
 
-    public int AmountOfDays()
+    public override string ToString()
     {
-        if (Month == 1 || Month == 3 || Month == 5 || Month == 7 || Month == 8 || Month == 10 || Month == 12)
+        return "(" + Month + "-" + Day + "-" + Year + ")";
+    }
+
+    public bool BiggerThan(MyDate other) => Year > other.Year || Year == other.Year &&
+        (Month > other.Month || Month == other.Month && Day > other.Day);
+    
+    public bool BiggerOrEqThan(MyDate other) => Year > other.Year || Year == other.Year &&
+        (Month > other.Month || Month == other.Month && Day >= other.Day);
+
+    public bool Eq(MyDate other) => Year == other.Year && Month == other.Month && Day == other.Day;
+
+    public int DaysInMonth()
+    {
+        if (Month is 1 or 3 or 5 or 7 or 8 or 10 or 12)
             return 31;
-        if (Month == 4 || Month == 6 || Month == 9 || Month == 11)
+        if (Month is 4 or 6 or 9 or 11)
             return 30;
-        if (Year % 400 == 0 || Year % 100 != 0 && Year % 4 == 0)
+        if (IsLeapYear())
             return 29;
         return 28;
     }
+
+    public bool IsLeapYear() => IsLeapYear(Year);
+    public static bool IsLeapYear(int year) => year % 400 == 0 || year % 100 != 0 && year % 4 == 0;
 
     public static int DaysSince2025()
     {
@@ -292,7 +306,7 @@ public class MyDate
         while (year > 2025)
         {
             year--;
-            res += (year % 400 == 0 || year % 100 != 0 && year % 4 == 0 ? 366 : 365);
+            res += (IsLeapYear(year) ? 366 : 365);
         }
 
         int month = DateController.Month;
@@ -300,59 +314,16 @@ public class MyDate
         while (month > 1)
         {
             month--;
-            if (month == 1 || month == 3 || month == 5 || month == 7 || month == 8 || month == 10 || month == 12)
+            if (month is 1 or 3 or 5 or 7 or 8 or 10 or 12)
                 res += 31;
-            if (month == 4 || month == 6 || month == 9 || month == 11)
+            else if (month is 4 or 6 or 9 or 11)
                 res += 30;
-            if (year % 400 == 0 || year % 100 != 0 && year % 4 == 0)
+            else if (IsLeapYear(year))
                 res += 29;
+            else
+                res += 28;
         }
 
         return res;
     }
-}
-
-// [Serializable]
-// public class FourGoals
-// {
-//     public Colors currentSeries = new Colors();
-//     public Colors maxSeries = new Colors();
-//     public Colors inTotal = new Colors();
-//     
-//     // need here dictionary for every activity - sum of all period and last month and last year
-//     // maybe achivements here
-//     
-//     public FourGoals(int v1 = 0, int v2 = 0, int v3 = 0, int v4 = 0)
-//     { }
-//
-//     public void UpdateSeries(Day lastDay, bool wasSkip)
-//     {
-//         if (lastDay is not null)
-//         {
-//             int res = lastDay.GetNumberOfRatio();
-//
-//             for (int i = 0; i <= res; ++i)
-//             {
-//                 currentSeries.c[i]++;
-//                 inTotal.c[i]++;
-//                 if (maxSeries.c[i] < currentSeries.c[i])
-//                     maxSeries.c[i] = currentSeries.c[i];
-//             }
-//             for (int i = res + 1; i < 9; ++i)
-//             {
-//                 currentSeries.c[i] = 0;
-//             }
-//         }
-//
-//         if (!wasSkip) return;
-//         
-//         for (int i = 0; i < 9; ++i)
-//             currentSeries.c[i] = 0;
-//     }
-// }
-
-[Serializable]
-public class Colors
-{
-    public int[] c = new int[9];
 }

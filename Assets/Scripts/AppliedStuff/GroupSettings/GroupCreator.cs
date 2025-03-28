@@ -31,7 +31,7 @@ namespace GreatDevResh.AppliedStuff.GroupSettings
             string newName = ProcessedString().ToLower();
             bool notContains = GeneralData.GroupNames.Aggregate(true, 
                 (current, group) => current && group.ToLower() != newName);
-            notContains &= newName != GroupDropDown.Without_Group;
+            notContains &= newName != GroupDropDown.Without_Group && newName != GroupDropDown.Only_Not_Done;
             BtnCreate.SetActive(newName != "" && notContains);
         }
 

@@ -105,7 +105,6 @@ namespace GreatDevResh.AppliedStuff
                 obj.SetSection(section);
 
                 currentRegime.activities.Add(obj);
-                GeneralData.Save();
             } else if (whatWeCreating == 2)
             {
                 CheckBoxClass obj = new CheckBoxClass
@@ -117,7 +116,6 @@ namespace GreatDevResh.AppliedStuff
                 };
                 
                 currentRegime.activities.Add(obj);
-                GeneralData.Save();
             } else if (whatWeCreating == 1)
             {
                 TimeSection section = new TimeSection
@@ -136,9 +134,9 @@ namespace GreatDevResh.AppliedStuff
                 };
                 
                 currentRegime.activities.Add(obj);
-                GeneralData.Save();
             }
             
+            GeneralData.Save();
             GoalShower.UpdateList();
         }
 

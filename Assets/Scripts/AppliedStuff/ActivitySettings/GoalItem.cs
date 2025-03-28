@@ -60,5 +60,10 @@ namespace GreatDevResh.AppliedStuff
         }
         
         protected virtual void UpdateGroupVisual() {}
+        
+        public void Copy()
+        {
+            GoalShower.StartCopingActivity(elementIndex);
+        }
     }
 }

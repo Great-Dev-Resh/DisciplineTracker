@@ -24,6 +24,7 @@ namespace GreatDevResh.Data
         public void SetValue(int _value) => value = Mathf.Min(Mathf.Max(_value, 0), 9999999);
         public void AddValue(int _value) => SetValue(_value + value);
         public void SetSection(GoalSection _section) => section = _section;
+        public override long GetAmount() => value;
 
         public int[] GetChanges()
         {

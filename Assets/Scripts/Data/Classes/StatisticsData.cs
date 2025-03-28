@@ -53,8 +53,8 @@ namespace GreatDevResh.Data.Classes
         {
             Info.Init();
 
-            MyDate date = new MyDate(ref GeneralData.startDate);
-            int day = GeneralData.startDay;
+            MyDate date = new MyDate(GeneralData.startDate);
+            int day = GeneralData.startDate.Day;
 
             CurrentSeries = new StatisticsColorData();
             BiggestSeries = new StatisticsColorData();
@@ -64,9 +64,9 @@ namespace GreatDevResh.Data.Classes
             while (date <= Info.now)
             {
                 Info.CheckForDate(date);
-                MonthData monthData = Info.Store[date.Int()];
+                MonthData monthData = Info.Store[date.MonthHash()];
 
-                int amountOfDays = date.AmountOfDays();
+                int amountOfDays = date.DaysInMonth();
                 date.Month++;
                 while ((date > Info.now ? day < DateController.Day : day <= amountOfDays))
                 {
@@ -109,7 +109,7 @@ namespace GreatDevResh.Data.Classes
             if (!isCreated)
                 LoadData();
             
-            int number = Info.Store[date.Int()].days[day].GetNumberOfRatio() - 1;
+            int number = Info.Store[date.MonthHash()].days[day].GetNumberOfRatio() - 1;
 
             if (number >= 0)
             {
@@ -125,12 +125,12 @@ namespace GreatDevResh.Data.Classes
                 CurrentSeries.ClearSince(0);
             }
 
-            MyDate lastMonth = new MyDate(ref date);
+            MyDate lastMonth = new MyDate(date);
             lastMonth.Month--;
             Info.CheckForDate(lastMonth);
-            if (Info.Store[lastMonth.Int()] is not null && Info.Store[lastMonth.Int()].days is not null && 
-                Info.Store[lastMonth.Int()].days[day] is not null && Info.Store[lastMonth.Int()].days[day].GetNumberOfRatio() >= 1)
-                LastMonthCount.Reduce(Info.Store[lastMonth.Int()].days[day].GetNumberOfRatio() - 1);
+            if (Info.Store[lastMonth.MonthHash()] is not null && Info.Store[lastMonth.MonthHash()].days is not null && 
+                Info.Store[lastMonth.MonthHash()].days[day] is not null && Info.Store[lastMonth.MonthHash()].days[day].GetNumberOfRatio() >= 1)
+                LastMonthCount.Reduce(Info.Store[lastMonth.MonthHash()].days[day].GetNumberOfRatio() - 1);
             
             SaveData();
         }

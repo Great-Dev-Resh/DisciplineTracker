@@ -20,7 +20,7 @@ namespace GreatDevResh.AppliedStuff.AllDays
         public void Init(MyDate date, int day, in bool sortingDefaultValue, in List<string> sortingGroupElse)
         {
             DateText.text = day + "." + date.Month + "." + date.Year;
-            Day dayData = Info.Store[date.Int()].days[day];
+            Day dayData = Info.Store[date.MonthHash()].days[day];
             if (dayData is null)
                 return;
 
@@ -30,7 +30,7 @@ namespace GreatDevResh.AppliedStuff.AllDays
         private void SetProgress(Day dayData, in bool sortingDefaultValue, in List<string> sortingGroupElse)
         {
             float ratio = Mathf.Max(dayData.GetRawRatio(in sortingDefaultValue, in sortingGroupElse), 0);
-            Color color = dayColors.RatioToColor(ratio);
+            Color color = DayColors.RatioToColor(ratio);
             
             ProgressImage.color = color;
             ProgressImage.fillAmount = ratio;
