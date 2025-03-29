@@ -11,6 +11,7 @@ namespace GreatDevResh.Data.Statistics_v3
         private static StatisticsCluster oldCluster; // old cluster is needed to be to easily add new statists
         public static StatisticsCluster workingCluster { get; private set; }
         public static MyDate endDay; // when stops calculations. Excluded this day;
+        public static MyDate currentEndDay;
 
         private const string NameOfFile = "PrecalculatedData.gdr";
 
@@ -38,27 +39,28 @@ namespace GreatDevResh.Data.Statistics_v3
             Save();
 
             workingCluster = new StatisticsCluster(oldCluster);
+            currentEndDay = new MyDate(endDay);
             // update with new days
             UpdateToNow();
         }
 
         private static void UpdateToNow()
         {
-            while (Info.now.BiggerThan(endDay))
+            while (Info.now.BiggerThan(currentEndDay))
             {
                 // get day
-                Info.CheckForDate(endDay);
-                Day dayData = Info.Store[endDay.MonthHash()].days[endDay.Day];
+                Info.CheckForDate(currentEndDay);
+                Day dayData = Info.Store[currentEndDay.MonthHash()].days[currentEndDay.Day];
                 // apply day to cluster
-                workingCluster.ProcessDay(endDay, dayData);
+                workingCluster.ProcessDay(currentEndDay, dayData);
 
-                endDay.Day++;
+                currentEndDay.Day++;
             }
         }
 
         private static void TryMoveForward()
         {
-            while (endDay.Year != Info.now.Year || endDay.Month != Info.now.Month)
+            while (endDay.Year + 1 < Info.now.Year || endDay.Year + 1 == Info.now.Year && endDay.Month < Info.now.Month)
             {
                 // get day
                 Info.CheckForDate(endDay);

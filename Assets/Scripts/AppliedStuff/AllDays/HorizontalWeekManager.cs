@@ -20,9 +20,7 @@ namespace GreatDevResh.AppliedStuff.AllDays
         private bool isContentPositionUpdated = false;
 
         private MyDate DateOfFirstWeek;
-        private int dayOfFirstWeek;
         private MyDate DateOfLastWeek; // not include last week
-        private int dayOfLastWeek;
 
         private bool sortingDefaultValue = true;
         private List<string> sortingGroupsElse;
@@ -45,48 +43,27 @@ namespace GreatDevResh.AppliedStuff.AllDays
             }
 
             float height = (weekPrefab.rect.height + VerticalLayoutContentGroup.spacing) * JumpAmount;
-            while (contentTransform.localPosition.y > height &&
-                (DateOfLastWeek > GeneralData.startDate || DateOfLastWeek == GeneralData.startDate && dayOfLastWeek >= GeneralData.startDate.Day))
+            while (contentTransform.localPosition.y > height && DateOfLastWeek.BiggerOrEqThan(GeneralData.startDate))
             {
                 Canvas.ForceUpdateCanvases();
                 isContentPositionUpdated = true;
                 contentTransform.localPosition -= new Vector3(0, height, 0);
                 scrollRect.AddToContentPosition(new Vector2(0, -height));
                 
-                dayOfFirstWeek -= 7 * JumpAmount;
-                while (dayOfFirstWeek < 1)
-                {
-                    DateOfFirstWeek.Month--;
-                    dayOfFirstWeek += DateOfFirstWeek.DaysInMonth();
-                }
-                dayOfLastWeek -= 7 * JumpAmount;
-                while (dayOfLastWeek < 1)
-                {
-                    DateOfLastWeek.Month--;
-                    dayOfLastWeek += DateOfLastWeek.DaysInMonth();
-                }
+                DateOfFirstWeek.Day -= 7 * JumpAmount;
+                DateOfLastWeek.Day -= 7 * JumpAmount;
                 
                 RecalculateNumbers();
             }
-            while (contentTransform.localPosition.y < 0 && DateController.IsItWasEarlier(DateOfFirstWeek, dayOfFirstWeek))
+            while (contentTransform.localPosition.y < 0 && Info.now.BiggerOrEqThan(DateOfFirstWeek))
             {
                 Canvas.ForceUpdateCanvases();
                 isContentPositionUpdated = true;
                 contentTransform.localPosition += new Vector3(0, height, 0);
                 scrollRect.AddToContentPosition(new Vector2(0, height));
                 
-                dayOfFirstWeek += 7 * JumpAmount;
-                while (dayOfFirstWeek > DateOfFirstWeek.DaysInMonth())
-                {
-                    dayOfFirstWeek -= DateOfFirstWeek.DaysInMonth();
-                    DateOfFirstWeek.Month++;
-                }
-                dayOfLastWeek += 7 * JumpAmount;
-                while (dayOfLastWeek > DateOfLastWeek.DaysInMonth())
-                {
-                    dayOfLastWeek -= DateOfLastWeek.DaysInMonth();
-                    DateOfLastWeek.Month++;
-                }
+                DateOfFirstWeek.Day += 7 * JumpAmount;
+                DateOfLastWeek.Day += 7 * JumpAmount;
                 
                 RecalculateNumbers();
             }
@@ -100,7 +77,7 @@ namespace GreatDevResh.AppliedStuff.AllDays
                 return;
             for (int i = 0; i < weekElements.Count; ++i)
             {
-                weekElements[i].UpdateDays(new MyDate(DateOfFirstWeek), dayOfFirstWeek - (weekElements.Count - i - 1) * 7,
+                weekElements[i].UpdateDays(new MyDate(DateOfFirstWeek), DateOfFirstWeek.Day - (weekElements.Count - i - 1) * 7,
                     in sortingDefaultValue, in sortingGroupsElse);
             }
         }
@@ -143,36 +120,17 @@ namespace GreatDevResh.AppliedStuff.AllDays
             Info.Init();
             
             DateOfFirstWeek = new MyDate(Info.now);
-            dayOfFirstWeek = DateController.Day;
             int dayOfWeek = DateController.DayOfWeek <= 0 ? 7 : DateController.DayOfWeek;
-            dayOfFirstWeek -= dayOfWeek - 8;
+            DateOfFirstWeek.Day += 8 - dayOfWeek;
 
             if (sortingGroupsElse is null)
                 sortingGroupsElse = new List<string>();
-
-            if (dayOfFirstWeek < 1)
-            {
-                DateOfFirstWeek.Month--;
-                dayOfFirstWeek += DateOfFirstWeek.DaysInMonth();
-            }
-            if (dayOfFirstWeek > DateOfFirstWeek.DaysInMonth())
-            {
-                dayOfFirstWeek -= DateOfFirstWeek.DaysInMonth();
-                DateOfFirstWeek.Month++;
-            }
-
-            // Init();
         }
         
         private void CalculateDateOfLastWeek()
         {
-            dayOfLastWeek = dayOfFirstWeek - 7 * weekElements.Count + 7;
             DateOfLastWeek = new MyDate(DateOfFirstWeek);
-            while (dayOfLastWeek < 1)
-            {
-                DateOfLastWeek.Month--;
-                dayOfLastWeek += DateOfLastWeek.DaysInMonth();
-            }
+            DateOfLastWeek.Day = DateOfFirstWeek.Day - 7 * weekElements.Count + 7;
         }
         
         private void OnEnable()

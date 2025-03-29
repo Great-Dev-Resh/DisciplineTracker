@@ -63,7 +63,7 @@ namespace GreatDevResh.AppliedStuff.Statistics_v3
 
             line.type = _type;
             line.period = _period;
-            PrecalculatedData.AddLine(!_titleToggle.isOn ? _titleIF.text : "", _mod, line);
+            PrecalculatedData.AddLine(!_titleToggle.isOn ? Helpers.ProcessTitle(_titleIF.text) : "", _mod, line);
             _statisticsShower.UpdateList();
         }
 

@@ -214,14 +214,14 @@ public class MyDate
     {
         Year = year;
         Month = month;
-        Day = day;
+        _day = day;
     }
 
     public MyDate(MyDate myDate)
     {
         Year = myDate.Year;
-        Month = myDate.Month;
-        Day = myDate.Day;
+        _month = myDate._month;
+        _day = myDate._day;
     }
 
     public MyDate(string str, ref int ind)

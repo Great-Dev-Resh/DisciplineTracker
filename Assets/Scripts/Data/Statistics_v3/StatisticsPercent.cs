@@ -39,7 +39,7 @@ namespace GreatDevResh.Data.Statistics_v3
 
         public override string ToString()
         {
-            return "{" + base.ToString() + "," + sum + ',' + cnt + "}";
+            return "{" + base.ToString() + "," + StringHelper.DoubleToString(sum) + ',' + cnt + "}";
         }
         
         public override void ProcessDay(MyDate date, float completeness, long amount = 0)

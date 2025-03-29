@@ -66,6 +66,7 @@ namespace GreatDevResh.AppliedStuff.AllDays
         private void SetWholeGroups(Day dayData, in bool sortingDefaultValue, in List<string> sortingGroupElse)
         {
             Dictionary<string, float> completeness = new Dictionary<string, float>();
+            Dictionary<string, float> completenessLessOne = new Dictionary<string, float>();
             Dictionary<string, int> cnt = new Dictionary<string, int>();
             Dictionary<string, bool> done = new Dictionary<string, bool>();
             List<string> groups = new List<string>();
@@ -80,6 +81,7 @@ namespace GreatDevResh.AppliedStuff.AllDays
                 {
                     groups.Add(activity.group);
                     completeness.Add(activity.group, 0);
+                    completenessLessOne.Add(activity.group, 0);
                     cnt.Add(activity.group, 0);
                     done.Add(activity.group, true);
                 }
@@ -87,13 +89,15 @@ namespace GreatDevResh.AppliedStuff.AllDays
                 if (activity.CanBeCompleted())
                 {
                     completeness[activity.group] += activity.GetCompleteness() * activity.weight;
+                    completenessLessOne[activity.group] += Mathf.Min(activity.GetCompleteness(), 1) * activity.weight;
                     cnt[activity.group] += activity.weight;
                     if (activity.GetCompleteness() < 0.998f)
                         done[activity.group] = false;
                 }
             }
 
-            groups = groups.OrderBy(group => cnt[group] != 0 ? -completeness[group] / cnt[group] : 1).ToList();
+            groups = groups.OrderBy(group => cnt[group] != 0 ? (
+                done[group] ? -completeness[group] / cnt[group] : -completenessLessOne[group] / cnt[group]) : 1).ToList();
 
             for (int blockInd = 0; blockInd < CountOfActivityBlocks; ++blockInd)
             {
@@ -105,10 +109,12 @@ namespace GreatDevResh.AppliedStuff.AllDays
                     int ind = groups.Count - 1;
                     while (ind > blockInd && cnt[groups[ind]] == 0)
                         --ind;
-                    SetGroupToBlock(blockInd, groups[ind], completeness[groups[ind]] / cnt[groups[ind]], done[groups[ind]]);
+                    SetGroupToBlock(blockInd, groups[ind], (done[groups[ind]] ? completeness[groups[ind]] / cnt[groups[ind]] 
+                        : completenessLessOne[groups[ind]] / cnt[groups[ind]]), done[groups[ind]]);
                 } else
                 {
-                    SetGroupToBlock(blockInd, groups[blockInd], completeness[groups[blockInd]] / cnt[groups[blockInd]], done[groups[blockInd]]);
+                    SetGroupToBlock(blockInd, groups[blockInd], (done[groups[blockInd]] ? completeness[groups[blockInd]] / cnt[groups[blockInd]] 
+                        : completenessLessOne[groups[blockInd]] / cnt[groups[blockInd]]), done[groups[blockInd]]);
                 }
             }
         }

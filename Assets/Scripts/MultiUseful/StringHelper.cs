@@ -35,6 +35,11 @@ namespace GreatDevResh.MultiUseful
             return integer + dec;
         }
 
+        public static string DoubleToString(double value)
+        {
+            return (value / 1) + "," + (value % 1);
+        }
+
         public static string GetString(string str, ref int ind, int cnt)
         {
             string res = "";

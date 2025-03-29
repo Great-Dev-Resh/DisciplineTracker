@@ -31,10 +31,8 @@ namespace GreatDevResh.AppliedStuff.TodayActivity
             GroupText.text = scheduleClass.group;
             WeightText.text = "Weight: " + scheduleClass.weight;
             
-            LowerBoundaryText.text = scheduleClass.section.lowerBoundary.ResultHours + ":" +
-                                     scheduleClass.section.lowerBoundary.ResultMinutes + " /";
-            UpperBoundaryText.text = "/ " + scheduleClass.section.upperBoundary.ResultHours + ":" +
-                                     scheduleClass.section.upperBoundary.ResultMinutes;
+            LowerBoundaryText.text = scheduleClass.section.lowerBoundary.ToString() + " /";
+            UpperBoundaryText.text = "/ " + scheduleClass.section.upperBoundary.ToString();
             
         }
 

@@ -23,7 +23,7 @@ namespace GreatDevResh.Data.Statistics_v3
 
         public StatisticsMaxSeries(StatisticsMaxSeries other) : base(other)
         {
-            currentSeries = other.currentSeries;
+            currentSeries = new StatisticsColorData(other.currentSeries);
         }
 
         public override StatisticsLine GetCopy() => new StatisticsMaxSeries(this);
