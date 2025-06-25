@@ -89,6 +89,8 @@ public static class Info
             StatisticsData.RecalculateAll(); // TODO: optimize this
             StatisticsData.SaveData();
         }
+        
+        Vibration.Init();
     }
 
     public static void ForcedReInit()

@@ -90,6 +90,8 @@ namespace GreatDevResh.AppliedStuff.TodayActivity
             UpdatePicture();
             
             TodayController.SaveToday();
+            
+            Vibration.VibrateLittle();
         }
     }
 }

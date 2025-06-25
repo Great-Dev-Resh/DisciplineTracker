@@ -6,6 +6,7 @@ namespace GreatDevResh.Data.Classes
     {
         public static int CntActivitiesIn4Days, CntActivitiesIn7Days;
         public static int LanguageInd;
+        public static bool IsVibrationDisabled;
         
         public static bool IsCreated { get; private set; } = false;
 
@@ -14,6 +15,7 @@ namespace GreatDevResh.Data.Classes
             CntActivitiesIn7Days = 2;
             CntActivitiesIn4Days = 5;
             LanguageInd = 0;
+            IsVibrationDisabled = true;
 
             IsCreated = true;
         }
@@ -23,14 +25,16 @@ namespace GreatDevResh.Data.Classes
             ind++;
             CntActivitiesIn7Days = StringHelper.GetNumber(str, ref ind, ',');
             CntActivitiesIn4Days = StringHelper.GetNumber(str, ref ind, ',');
-            LanguageInd = StringHelper.GetNumber(str, ref ind, '}');
+            LanguageInd = StringHelper.GetNumber(str, ref ind, ',');
+            IsVibrationDisabled = StringHelper.GetNumber(str, ref ind, ',') != 0;
 
             IsCreated = true;
         }
         
         public static string ToString()
         {
-            string res = "{" + CntActivitiesIn7Days + "," + CntActivitiesIn4Days + "," + LanguageInd + "}";
+            string res = "{" + CntActivitiesIn7Days + "," + CntActivitiesIn4Days + "," + LanguageInd + ",";
+            res += (IsVibrationDisabled ? 1 : 0) + "}";
             
             return res;
         }

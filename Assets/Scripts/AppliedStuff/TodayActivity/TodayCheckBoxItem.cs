@@ -39,6 +39,8 @@ namespace GreatDevResh.AppliedStuff.TodayActivity
 
             checkBoxClass.Completed = value;
             TodayController.SaveToday();
+            
+            Vibration.VibratePop();
         }
     }
 }

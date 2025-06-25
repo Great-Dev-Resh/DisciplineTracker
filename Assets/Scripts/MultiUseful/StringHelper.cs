@@ -14,14 +14,14 @@ namespace GreatDevResh.MultiUseful
         public static long GetLong(string str, ref int ind, char stopChar, bool EatStopChar = true)
         {
             long res = 0, sign = 1;
-            if (str[ind] == '-' && stopChar != '-')
+            if (str.Length > ind && str[ind] == '-' && stopChar != '-')
             {
                 sign = -1;
                 ind++;
             }
-            while (str.Length > ind && str[ind] != stopChar)
+            while (str.Length > ind && str[ind] != stopChar && str[ind] >= '0' && str[ind] <= '9')
                 res = res * 10 + str[ind++] - '0';
-            if (EatStopChar)
+            if (str.Length > ind && EatStopChar)
                 ind++;
             return res * sign;
         }
