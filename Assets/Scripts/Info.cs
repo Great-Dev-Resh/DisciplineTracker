@@ -90,7 +90,7 @@ public static class Info
             StatisticsData.SaveData();
         }
         
-        Vibration.Init();
+        Vibration.Init(); // 🚀💭 
     }
 
     public static void ForcedReInit()
