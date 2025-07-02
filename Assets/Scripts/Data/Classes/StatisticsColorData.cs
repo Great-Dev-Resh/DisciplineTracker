@@ -37,6 +37,7 @@ namespace GreatDevResh.Data.Classes
             return data[ind];
         }
         
+        // ReSharper disable Unity.PerformanceAnalysis
         public void Add(int ind)
         {
             MakeSureThatLenghtEnough(ind);
@@ -87,6 +88,7 @@ namespace GreatDevResh.Data.Classes
             }
         }
 
+        // ReSharper disable Unity.PerformanceAnalysis
         private void MakeSureThatLenghtEnough(int ind)
         {
             if (ind > 40)

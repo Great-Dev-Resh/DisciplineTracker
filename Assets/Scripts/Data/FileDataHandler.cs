@@ -11,6 +11,7 @@ public static class FileDataHandler
         dataDirPath = _dataDirPath;
     }
 
+    // ReSharper disable Unity.PerformanceAnalysis
     public static string Load(string fileName)
     {
         string fullPath = Path.Combine(dataDirPath, fileName);
@@ -39,6 +40,7 @@ public static class FileDataHandler
         return null;
     }
 
+    // ReSharper disable Unity.PerformanceAnalysis
     public static void Save(string fileName, string data)
     {
         string fullPath = Path.Combine(dataDirPath, fileName);
